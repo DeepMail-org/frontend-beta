@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeepMail SOC - Analysis Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#bd93f9", // Dracula Purple
+              "on-primary": "#282a36",
+              "secondary": "#ff79c6", // Dracula Pink
+              "tertiary": "#50fa7b", // Dracula Green
+              "error": "#ff5555", // Dracula Red
+              "warning": "#ffb86c", // Dracula Orange
+              "highlight": "#8be9fd", // Dracula Cyan
+              "background": "#0b0f1a", // Deep Neutral Navy
+              "surface": "#141926", 
+              "surface-container": "#1a2131",
+              "on-surface": "#f8f8f2", // Dracula Light Gray
+              "on-surface-variant": "#94a3b8",
+              "outline": "#44475a", // Dracula Comment/Darker Gray
+              "outline-variant": "#282a36"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(20, 25, 38, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(189, 147, 249, 0.1);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Subtle Glows */
+        .glow-red { box-shadow: 0 0 20px -5px rgba(255, 85, 85, 0.2); }
+        .glow-purple { box-shadow: 0 0 20px -5px rgba(189, 147, 249, 0.2); }
+        .glow-green { box-shadow: 0 0 20px -5px rgba(80, 250, 123, 0.2); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full z-40 h-screen w-64 border-r border-outline/30 bg-[#080b12]/90 backdrop-blur-xl font-['Space_Grotesk'] tracking-tight">
+<div class="p-6">
+<div class="flex items-center gap-2 mb-8">
+<span class="text-xl font-bold text-primary tracking-tighter">DeepMail</span>
+<span class="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold uppercase tracking-widest">SOC Platform</span>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 border-r-2 border-primary transition-all duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Analysis</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="cloud_upload">cloud_upload</span>
+<span>Upload</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="biotech">biotech</span>
+<span>Sandbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 flex items-center justify-between px-8 z-30 bg-background/50 backdrop-blur-md font-['Space_Grotesk'] border-b border-outline/20">
+<div class="flex items-center gap-6">
+<div class="relative w-96 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="w-full bg-surface-container border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary/50 placeholder:text-outline transition-all" placeholder="Search IOCs, Hash, or Incident ID..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/5 rounded-lg transition-all active:opacity-70">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<div class="h-8 w-px bg-outline/30 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-semibold text-on-surface">Analyst_04</p>
+<p class="text-[10px] text-on-surface-variant">Tier 2 Responder</p>
+</div>
+<img alt="User Profile" class="h-10 w-10 rounded-full border border-primary/30 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfhZGE-WRcAE4xJ1P5q71X568V3W4GptSxZI7vsd6_y07NNYQHPj32ujZeuJZWBbncbVamhSu7WaJG4ooXIeGMlkVxv6pglXdTxAWmjsBlOztaOD-eoTlhW508cmSvmeuqr-j4UOQVigpTKw25QOXxpatfBqSkjFnEeLGKaf42QETrZvqw8XcCPwMIHu3nCEkloU8xdbU-yJ0sjo0FRe7f4rUmZTh6VwHEr3aOAzDCXJIMGSEV8MXCZov2yZTtgoWqQomQ7HmsjPRg"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 pb-12 px-8 min-h-screen">
+<!-- Header: Threat Score Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+<div class="lg:col-span-4 glass-panel rounded-xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden group glow-red">
+<div class="absolute inset-0 bg-gradient-to-br from-error/10 to-transparent opacity-50"></div>
+<div class="relative mb-6">
+<svg class="w-40 h-40 transform -rotate-90">
+<circle class="text-outline/20" cx="80" cy="80" fill="transparent" r="74" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-error drop-shadow-[0_0_8px_rgba(255,85,85,0.6)]" cx="80" cy="80" fill="transparent" r="74" stroke="currentColor" stroke-dasharray="465" stroke-dashoffset="37" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-5xl font-headline font-bold text-on-surface">92</span>
+<span class="text-[10px] font-bold text-error tracking-tighter uppercase">Critical Risk</span>
+</div>
+</div>
+<div class="space-y-1 z-10">
+<h2 class="text-xl font-headline font-bold">Malicious Intent Detected</h2>
+<p class="text-on-surface-variant text-sm">Confidence Score: <span class="text-tertiary">98.4%</span></p>
+</div>
+</div>
+<!-- Metadata Panel -->
+<div class="lg:col-span-8 glass-panel rounded-xl p-8 flex flex-col justify-between glow-purple">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h1 class="text-2xl font-headline font-bold tracking-tight">Report #DX-9021-X</h1>
+<span class="px-3 py-1 bg-error/20 text-error text-[10px] font-bold rounded-full uppercase tracking-widest border border-error/30">Immediate Action Required</span>
+</div>
+<p class="text-on-surface-variant max-w-2xl">Subject: <span class="text-on-surface font-medium">Urgent: Financial Statement Update Required - [Action Required]</span></p>
+</div>
+<button class="bg-gradient-to-r from-primary to-secondary text-on-primary px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+                    Quarantine Email
+                </button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="space-y-1">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Sender</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="alternate_email">alternate_email</span>
+<p class="text-sm font-medium truncate">support-security@amaz0n-verify.co</p>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Origin IP</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="lan">lan</span>
+<p class="text-sm font-medium">185.22.140.92</p>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Location</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="public">public</span>
+<p class="text-sm font-medium">Bucharest, RO</p>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Detected At</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="schedule">schedule</span>
+<p class="text-sm font-medium">14:22:10 UTC</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Pipeline Timeline -->
+<section class="glass-panel rounded-xl p-8 mb-8 overflow-x-auto no-scrollbar">
+<h3 class="text-sm font-headline font-bold mb-8 uppercase tracking-widest text-on-surface-variant">Analysis Pipeline Status</h3>
+<div class="flex items-center justify-between min-w-[800px]">
+<!-- Step 1 -->
+<div class="flex flex-col items-center gap-3 relative flex-1">
+<div class="w-10 h-10 rounded-full bg-tertiary/20 border border-tertiary/40 flex items-center justify-center text-tertiary shadow-[0_0_15px_rgba(80,250,123,0.3)] z-10">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+</div>
+<p class="text-xs font-bold text-on-surface">Header Analysis</p>
+<div class="absolute left-1/2 top-5 w-full h-[2px] bg-tertiary/40"></div>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center gap-3 relative flex-1">
+<div class="w-10 h-10 rounded-full bg-tertiary/20 border border-tertiary/40 flex items-center justify-center text-tertiary shadow-[0_0_15px_rgba(80,250,123,0.3)] z-10">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+</div>
+<p class="text-xs font-bold text-on-surface">IOC Extraction</p>
+<div class="absolute left-1/2 top-5 w-full h-[2px] bg-tertiary/40"></div>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center gap-3 relative flex-1">
+<div class="w-10 h-10 rounded-full bg-error/20 border border-error/40 flex items-center justify-center text-error shadow-[0_0_15px_rgba(255,85,85,0.3)] z-10">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+</div>
+<p class="text-xs font-bold text-on-surface">URL Scan</p>
+<div class="absolute left-1/2 top-5 w-full h-[2px] bg-error/20"></div>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center gap-3 relative flex-1">
+<div class="w-10 h-10 rounded-full bg-surface-container border border-outline flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined" data-icon="attachment">attachment</span>
+</div>
+<p class="text-xs font-bold text-on-surface-variant">Attachment Scan</p>
+<div class="absolute left-1/2 top-5 w-full h-[2px] bg-outline/20"></div>
+</div>
+<!-- Step 5 -->
+<div class="flex flex-col items-center gap-3 relative">
+<div class="w-10 h-10 rounded-full bg-surface-container border border-outline flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined" data-icon="biotech">biotech</span>
+</div>
+<p class="text-xs font-bold text-on-surface-variant">Sandbox Detonation</p>
+</div>
+</div>
+</section>
+<!-- IOC Panels Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<!-- IP/Network Card -->
+<div class="glass-panel rounded-xl p-6 hover:shadow-lg hover:shadow-primary/5 transition-all">
+<div class="flex justify-between items-center mb-6">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Network Assets</span>
+<span class="material-symbols-outlined text-secondary" data-icon="router">router</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-background/50 rounded-lg border border-error/20 flex items-center justify-between">
+<span class="text-sm font-mono text-highlight">185.22.140.92</span>
+<span class="px-2 py-0.5 bg-error/20 text-error text-[10px] font-bold rounded">MALICIOUS</span>
+</div>
+<div class="p-3 bg-background/50 rounded-lg flex items-center justify-between">
+<span class="text-sm font-mono text-on-surface-variant">104.21.32.1</span>
+<span class="px-2 py-0.5 bg-on-surface-variant/20 text-on-surface-variant text-[10px] font-bold rounded">NEUTRAL</span>
+</div>
+</div>
+</div>
+<!-- Domain/URL Card -->
+<div class="glass-panel rounded-xl p-6 hover:shadow-lg hover:shadow-primary/5 transition-all">
+<div class="flex justify-between items-center mb-6">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Domains &amp; URLs</span>
+<span class="material-symbols-outlined text-secondary" data-icon="language">language</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-background/50 rounded-lg border border-error/20 flex items-center justify-between">
+<span class="text-sm truncate mr-2 text-highlight">amaz0n-verify.co/login</span>
+<span class="px-2 py-0.5 bg-error/20 text-error text-[10px] font-bold rounded shrink-0">PHISHING</span>
+</div>
+<div class="p-3 bg-background/50 rounded-lg flex items-center justify-between">
+<span class="text-sm truncate mr-2 text-on-surface-variant">cdn.amazon.com/styles</span>
+<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary text-[10px] font-bold rounded shrink-0">LEGIT</span>
+</div>
+</div>
+</div>
+<!-- Files/Hashes Card -->
+<div class="glass-panel rounded-xl p-6 hover:shadow-lg hover:shadow-primary/5 transition-all">
+<div class="flex justify-between items-center mb-6">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">File Hashes</span>
+<span class="material-symbols-outlined text-secondary" data-icon="fingerprint">fingerprint</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-background/50 rounded-lg flex flex-col gap-1">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase">SHA-256</p>
+<span class="text-xs font-mono break-all leading-tight text-highlight">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+</div>
+</div>
+</div>
+<!-- Behavior/Tactics Card -->
+<div class="glass-panel rounded-xl p-6 hover:shadow-lg hover:shadow-primary/5 transition-all">
+<div class="flex justify-between items-center mb-6">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">MITRE ATT&amp;CK®</span>
+<span class="material-symbols-outlined text-secondary" data-icon="grid_view">grid_view</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-on-surface text-[10px] font-medium rounded border border-outline/30">T1566: Phishing</span>
+<span class="px-2 py-1 bg-surface-container text-on-surface text-[10px] font-medium rounded border border-outline/30">T1204: User Execution</span>
+<span class="px-2 py-1 bg-surface-container text-on-surface text-[10px] font-medium rounded border border-outline/30">T1583: Infrastructure</span>
+<span class="px-2 py-1 bg-surface-container text-on-surface text-[10px] font-medium rounded border border-outline/30">+2 more</span>
+</div>
+</div>
+</section>
+<!-- Developer Section: Code View -->
+</main>
+<!-- Floating Global Status Pips -->
+<div class="fixed bottom-6 right-8 flex items-center gap-6 z-50 pointer-events-none">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_#50fa7b]"></span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Network Secure</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#ff79c6]"></span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">7 Nodes Active</span>
+</div>
+</div>
+</body></html>

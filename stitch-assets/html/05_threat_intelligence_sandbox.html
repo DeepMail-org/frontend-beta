@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeepMail SOC - Upload &amp; Sandbox</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#bd93f9", // Dracula Purple
+                        "secondary": "#ff79c6", // Dracula Pink
+                        "tertiary": "#50fa7b", // Dracula Green
+                        "error": "#ff5555", // Dracula Red
+                        "warning": "#f1fa8c", // Dracula Yellow
+                        "on-primary": "#282a36",
+                        "surface": "#0b0f1a", // Requested deep neutral
+                        "surface-bright": "#1a1f2e",
+                        "surface-container": "#141927",
+                        "surface-container-low": "#0f131f",
+                        "surface-container-high": "#1e2435",
+                        "surface-container-highest": "#282e3f",
+                        "surface-container-lowest": "#05070a",
+                        "on-surface": "#f8f8f2",
+                        "on-surface-variant": "#94a3b8",
+                        "outline": "#44475a",
+                        "outline-variant": "#2d3446",
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(20, 25, 39, 0.4);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(189, 147, 249, 0.15);
+            border-left: 1px solid rgba(189, 147, 249, 0.15);
+        }
+        .glow-border {
+            box-shadow: 0 0 20px rgba(189, 147, 249, 0.1);
+        }
+        .dracula-gradient {
+            background: linear-gradient(135deg, #bd93f9 0%, #ff79c6 100%);
+        }
+        .globe-container {
+            perspective: 1000px;
+        }
+        @keyframes globe-rotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        .animate-rotate {
+            animation: globe-rotate 60s linear infinite;
+        }
+        .arc-path {
+            stroke-dasharray: 100;
+            animation: dash 5s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -200; }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full z-40 w-64 border-r border-outline-variant bg-surface-container-lowest/80 backdrop-blur-xl shadow-2xl shadow-primary/5 font-['Space_Grotesk'] tracking-tight">
+<div class="p-6">
+<div class="text-xl font-bold text-primary tracking-tighter mb-1">DeepMail</div>
+<div class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant font-bold">SOC Platform</div>
+</div>
+<nav class="mt-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-primary/5 hover:text-primary duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 border-r-2 border-primary transition-all hover:bg-primary/20 duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span>Upload</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-primary/5 hover:text-primary duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Analysis</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-primary/5 hover:text-primary duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span>Sandbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-primary/5 hover:text-primary duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors hover:bg-primary/5 hover:text-primary duration-200 ease-out active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-64 h-16 flex items-center justify-between px-8 z-30 bg-surface/40 backdrop-blur-md font-['Space_Grotesk'] border-b border-outline-variant/30">
+<div class="flex items-center gap-6 w-1/2">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-high/50 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary text-on-surface placeholder:text-on-surface-variant/50" placeholder="Search threats, logs, or hashes..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest/50 rounded-lg transition-all active:opacity-70">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCApG-0HRO2dm0LX1dvA_nMQxHIXpsgjpPnFge7luICnNVscMA8eCUFiWiVTleQwb3kJPlvBRxyLB11Cjpli4LwbERfDuAWtOWfza8rZOHhFSAF9Z-iLBT_P4o0cLl794uT1w3Z5jR9J9Dw5CwMhHKTSx6p3Xi129-ed2IlxLTJb_6n8twN3yTffS9Xd_2oL60xlrXyDk7AsA3l8AmXjWV2N_JjD1POh4hjJU45rpFFaBwzN5pwwr52wwinQHcDO4u4BaenzUHfbAci"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-24 pb-12 px-8 min-h-screen bg-surface">
+<div class="max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="mb-10">
+<h1 class="font-headline text-4xl font-bold tracking-tight text-on-surface mb-2">Upload &amp; Sandbox</h1>
+<p class="text-on-surface-variant max-w-2xl">Deploy suspicious payloads into isolated environments for deep behavioral analysis and automated redirect chain mapping.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Hero Upload Area -->
+<div class="col-span-12 lg:col-span-8">
+<div class="glass-panel rounded-xl p-8 h-[420px] flex flex-col items-center justify-center border-dashed border-2 border-primary/30 relative overflow-hidden group cursor-pointer transition-all hover:border-primary/60 glow-border">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 border border-primary/20 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">cloud_upload</span>
+</div>
+<h3 class="font-headline text-2xl font-semibold mb-2">Drop Email Artifacts Here</h3>
+<p class="text-on-surface-variant mb-6 text-sm">Supported formats: .eml, .msg, .pdf, .zip (password protected)</p>
+<button class="px-8 py-3 rounded-lg font-semibold text-on-primary dracula-gradient shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">Browse Files</button>
+</div>
+</div>
+</div>
+<!-- Sandbox Settings -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<div class="glass-panel rounded-xl p-6 flex-1">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">settings</span>
+<h4 class="font-headline font-semibold text-lg">Environment Config</h4>
+</div>
+<div class="space-y-5">
+<div>
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 block">Operating System</label>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 py-3 rounded-lg bg-surface-container-highest border border-primary/40 text-sm font-medium text-primary">
+<span class="material-symbols-outlined text-sm">desktop_windows</span> Windows 11
+                                </button>
+<button class="flex items-center justify-center gap-2 py-3 rounded-lg bg-surface-container-low text-on-surface-variant border border-outline-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span> Linux Ubuntu
+                                </button>
+</div>
+</div>
+<div>
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 block">Browser Engine</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary appearance-none text-on-surface">
+<option>Google Chrome v121.x</option>
+<option>Mozilla Firefox v119.x</option>
+<option>Microsoft Edge v120.x</option>
+</select>
+</div>
+<div class="pt-4 space-y-3">
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container/50">
+<span class="text-sm">Network Simulation</span>
+<div class="w-10 h-5 bg-tertiary/20 rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-3 h-3 bg-tertiary rounded-full shadow-[0_0_8px_rgba(80,250,123,0.6)]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container/50">
+<span class="text-sm">Memory Forensics</span>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full relative border border-outline-variant cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-outline rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- URL Analysis Box -->
+<div class="col-span-12">
+<div class="glass-panel rounded-xl p-8">
+<div class="flex flex-col md:flex-row items-end gap-6">
+<div class="flex-1 w-full">
+<label class="font-headline text-lg font-medium mb-3 block text-secondary">URL Deep Scan</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">link</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-4 pl-12 pr-4 text-on-surface focus:ring-2 focus:ring-primary transition-all outline-none" placeholder="https://suspicious-portal.com/login-verify-account-update" type="text"/>
+</div>
+</div>
+<button class="h-[58px] px-10 rounded-xl font-bold text-on-primary dracula-gradient shadow-lg shadow-primary/20 whitespace-nowrap active:scale-95 transition-all">Analyze Now</button>
+</div>
+</div>
+</div>
+<!-- Execution Timeline -->
+<div class="col-span-12 lg:col-span-5">
+<div class="glass-panel rounded-xl p-6 h-full">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-headline font-semibold text-lg text-primary">Execution Timeline</h4>
+<div class="flex gap-2">
+<span class="px-2 py-1 rounded bg-error/10 text-error text-[10px] font-bold uppercase tracking-tight">Active Scan</span>
+<span class="px-2 py-1 rounded bg-tertiary/10 text-tertiary text-[10px] font-bold uppercase tracking-tight">00:14:22</span>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-tertiary glow-border ring-4 ring-tertiary/10 shadow-[0_0_8px_rgba(80,250,123,0.6)]"></div>
+<div class="w-0.5 h-12 bg-outline-variant/30 mt-1"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex justify-between items-start mb-1">
+<span class="text-sm font-semibold">Environment Initialization</span>
+<span class="text-xs text-on-surface-variant font-mono">0.00s</span>
+</div>
+<p class="text-xs text-on-surface-variant">Win11 snapshot restored. Browser profile loaded.</p>
+</div>
+</div>
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-secondary glow-border ring-4 ring-secondary/10 shadow-[0_0_8px_rgba(255,121,198,0.6)]"></div>
+<div class="w-0.5 h-12 bg-outline-variant/30 mt-1"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex justify-between items-start mb-1">
+<span class="text-sm font-semibold">Initial GET Request</span>
+<span class="text-xs text-on-surface-variant font-mono">1.42s</span>
+</div>
+<p class="text-xs text-on-surface-variant">Domain resolution successful. DNS: AS13335.</p>
+</div>
+</div>
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-error glow-border ring-4 ring-error/10 shadow-[0_0_8px_rgba(255,85,85,0.6)]"></div>
+<div class="w-0.5 h-12 bg-outline-variant/30 mt-1"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex justify-between items-start mb-1">
+<span class="text-sm font-semibold text-error">Obfuscated JS Execution</span>
+<span class="text-xs text-on-surface-variant font-mono">4.18s</span>
+</div>
+<p class="text-xs text-on-surface-variant">Detected high-entropy blob. De-obfuscating...</p>
+</div>
+</div>
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-primary animate-pulse glow-border ring-4 ring-primary/10 shadow-[0_0_8px_rgba(189,147,249,0.6)]"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="text-sm font-semibold text-primary">Threat Origin Mapping</span>
+<span class="text-xs text-on-surface-variant font-mono">12.05s</span>
+</div>
+<div class="mt-3 p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/30">
+<div class="flex items-center gap-2 text-[10px] font-mono text-on-surface-variant">
+<span class="text-primary">root</span>: <span class="text-tertiary"># active_tracking --geo --live</span>
+<span class="inline-block w-1.5 h-3 bg-secondary animate-pulse"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Global Threat Map Visualization -->
+<div class="col-span-12 lg:col-span-7">
+<div class="glass-panel rounded-xl overflow-hidden h-[500px] flex flex-col relative glow-border">
+<div class="p-6 pb-0 flex justify-between items-center relative z-20">
+<h4 class="font-headline font-semibold text-lg flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary">public</span>
+                            Global Threat Propagation
+                        </h4>
+<div class="flex gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse shadow-[0_0_8px_rgba(255,85,85,0.8)]"></div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Live Feed</span>
+</div>
+<button class="p-1 rounded hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-sm text-on-surface-variant">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- 3D Globe Visual -->
+<div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+<div class="relative w-80 h-80 rounded-full bg-surface-container-lowest shadow-[inset_0_0_80px_rgba(189,147,249,0.1)] border border-primary/20">
+<!-- Background grid -->
+<div class="absolute inset-0 rounded-full overflow-hidden opacity-20">
+<div class="w-full h-full bg-[radial-gradient(circle_at_center,_transparent_0%,_#05070a_70%)]"></div>
+<svg class="w-full h-full animate-rotate" viewbox="0 0 100 100">
+<defs>
+<pattern height="10" id="grid" patternunits="userSpaceOnUse" width="10">
+<path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(189, 147, 249, 0.4)" stroke-width="0.2"></path>
+</pattern>
+</defs>
+<rect fill="url(#grid)" height="100" width="200" x="-50"></rect>
+</svg>
+</div>
+<!-- Connection Arcs -->
+<svg class="absolute inset-0 w-full h-full" viewbox="0 0 100 100">
+<path class="arc-path" d="M 30 40 Q 50 10 70 45" fill="none" stroke="url(#arc-grad-1)" stroke-width="0.5"></path>
+<path class="arc-path" d="M 20 60 Q 40 85 80 55" fill="none" stroke="url(#arc-grad-2)" stroke-width="0.5" style="animation-delay: -2s;"></path>
+<path class="arc-path" d="M 45 30 Q 85 50 60 75" fill="none" stroke="url(#arc-grad-1)" stroke-width="0.5" style="animation-delay: -1s;"></path>
+<defs>
+<lineargradient id="arc-grad-1" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#bd93f9" stop-opacity="0"></stop>
+<stop offset="50%" stop-color="#bd93f9"></stop>
+<stop offset="100%" stop-color="#bd93f9" stop-opacity="0"></stop>
+</lineargradient>
+<lineargradient id="arc-grad-2" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#ff79c6" stop-opacity="0"></stop>
+<stop offset="50%" stop-color="#ff79c6"></stop>
+<stop offset="100%" stop-color="#ff79c6" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Nodes -->
+<circle class="animate-pulse" cx="30" cy="40" fill="#ff5555" r="1.2">
+<animate attributename="r" dur="2s" repeatcount="indefinite" values="1.2;1.8;1.2"></animate>
+</circle>
+<circle cx="70" cy="45" fill="#bd93f9" r="1"></circle>
+<circle cx="20" cy="60" fill="#ff79c6" r="1.2"></circle>
+<circle cx="80" cy="55" fill="#50fa7b" r="1"></circle>
+</svg>
+<!-- Atmosphere Glow -->
+<div class="absolute inset-[-20px] rounded-full border border-primary/10 bg-primary/5 blur-2xl -z-10"></div>
+</div>
+</div>
+<!-- Live Geopolitical Threat Coordinates Sidebar -->
+<div class="absolute bottom-6 left-6 z-30 w-72">
+<div class="bg-surface-container-lowest/60 backdrop-blur-lg border border-primary/20 rounded-lg overflow-hidden shadow-2xl">
+<div class="bg-primary/10 px-4 py-2 border-b border-primary/10">
+<span class="text-[10px] font-bold text-primary uppercase tracking-widest">Live Geopolitical Threat Coordinates</span>
+</div>
+<div class="p-3 space-y-3">
+<div class="flex items-center gap-3 group">
+<div class="w-1.5 h-1.5 rounded-full bg-error shadow-[0_0_8px_rgba(255,85,85,0.8)]"></div>
+<div class="flex-1">
+<div class="flex justify-between text-[10px] font-mono text-on-surface-variant">
+<span>BUCHAREST, RO</span>
+<span class="text-secondary">44.4°N, 26.1°E</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="material-symbols-outlined text-[10px] text-tertiary">trending_flat</span>
+<span class="text-[10px] font-medium text-on-surface">NEW YORK, US</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 opacity-80">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(255,121,198,0.5)]"></div>
+<div class="flex-1">
+<div class="flex justify-between text-[10px] font-mono text-on-surface-variant">
+<span>BEIJING, CN</span>
+<span class="text-secondary">39.9°N, 116.4°E</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="material-symbols-outlined text-[10px] text-tertiary">trending_flat</span>
+<span class="text-[10px] font-medium text-on-surface">FRANKFURT, DE</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 opacity-60">
+<div class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(189,147,249,0.5)]"></div>
+<div class="flex-1">
+<div class="flex justify-between text-[10px] font-mono text-on-surface-variant">
+<span>KYIV, UA</span>
+<span class="text-secondary">50.4°N, 30.5°E</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="material-symbols-outlined text-[10px] text-tertiary">trending_flat</span>
+<span class="text-[10px] font-medium text-on-surface">TOKYO, JP</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Texture Overlay -->
+<div class="absolute inset-0 z-0 opacity-10 mix-blend-screen pointer-events-none">
+<img class="w-full h-full object-cover scale-150 rotate-12" data-alt="a digital world map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCobwGlkVT3AZxvxpg2RRXStxGnO7ecl2eTSECJYG6jtoervk9EdFxn3mtm-nCepQ4Fk3z9fZGtdZoE0Ab7oqNp5gRS2wUdpThPfo42JrWQx_ScMoxIUn_2GoSh-u77y4cQYaAH6ACupgZjGq_IxS5-GUfEuADMITSw6w_TefezU4jPGQyS7aw6LEcMeDgn4TjOJ_Ox9gBO92O3jZFccfgwr0zTO5lY_oLwNCJFmRHA9vXTRsaIXTDSZro4NEb2ctmxTEo2yPhnYl4A"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Background Elements -->
+<div class="fixed top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full z-[-1]"></div>
+<div class="fixed bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 blur-[120px] rounded-full z-[-1]"></div>
+</body></html>

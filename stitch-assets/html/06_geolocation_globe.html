@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary-fixed-dim": "#b48aef",
+            "secondary-dim": "#f36fbc",
+            "on-tertiary-fixed-variant": "#006828",
+            "on-secondary-fixed": "#680049",
+            "inverse-surface": "#faf8ff",
+            "secondary": "#fd77c4",
+            "surface-bright": "#262c3d",
+            "on-primary-fixed-variant": "#461b7d",
+            "error-dim": "#d73357",
+            "on-primary-container": "#320067",
+            "secondary-fixed-dim": "#ffaad5",
+            "on-tertiary-fixed": "#004819",
+            "on-primary": "#3f1176",
+            "secondary-fixed": "#ffc0de",
+            "on-error": "#490013",
+            "inverse-primary": "#724aaa",
+            "surface-tint": "#c49aff",
+            "on-error-container": "#ffb2b9",
+            "error": "#ff6e84",
+            "surface-variant": "#202535",
+            "inverse-on-surface": "#515562",
+            "on-tertiary": "#006727",
+            "on-primary-fixed": "#1a003b",
+            "surface-container": "#141927",
+            "tertiary-container": "#55fe7e",
+            "primary": "#c49aff",
+            "on-background": "#e8eafb",
+            "background": "#0a0e19",
+            "on-secondary-container": "#ffbedd",
+            "on-secondary": "#520039",
+            "surface": "#0a0e19",
+            "secondary-container": "#860f60",
+            "on-secondary-fixed-variant": "#931e6a",
+            "surface-container-highest": "#202535",
+            "tertiary-fixed-dim": "#42ef72",
+            "on-tertiary-container": "#005d23",
+            "tertiary-dim": "#42ef72",
+            "surface-dim": "#0a0e19",
+            "primary-dim": "#b48aef",
+            "tertiary": "#b8ffbb",
+            "on-surface": "#e8eafb",
+            "outline-variant": "#444855",
+            "outline": "#717583",
+            "primary-container": "#b68df2",
+            "surface-container-lowest": "#000000",
+            "surface-container-high": "#1a1f2e",
+            "on-surface-variant": "#a7aaba",
+            "surface-container-low": "#0f131f",
+            "primary-fixed": "#c197fe",
+            "tertiary-fixed": "#55fe7e",
+            "error-container": "#a70138"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk"],
+            "body": ["Space Grotesk"],
+            "label": ["Space Grotesk"]
+          },
+          borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-card {
+      background: rgba(20, 25, 39, 0.4);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(196, 154, 255, 0.1);
+    }
+    .neon-glow-primary {
+      filter: drop-shadow(0 0 8px rgba(196, 154, 255, 0.4));
+    }
+    .terminal-fade {
+      background: linear-gradient(to bottom, transparent 0%, #000000 100%);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopNavBar Implementation -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-6 h-16 bg-[#0a0e19]/80 backdrop-blur-xl border-b border-[#c49aff]/10 shadow-[0_0_20px_rgba(196,154,255,0.05)] z-50">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#c49aff] font-['Space_Grotesk']">DeepMail</span>
+<div class="hidden md:flex gap-6">
+<a class="text-[#c49aff] font-bold font-['Space_Grotesk'] tracking-tight hover:text-[#fd77c4] transition-colors duration-200" href="#">Analysis</a>
+<a class="text-[#a7aaba] font-['Space_Grotesk'] tracking-tight hover:text-[#fd77c4] transition-colors duration-200" href="#">Threat Vault</a>
+<a class="text-[#a7aaba] font-['Space_Grotesk'] tracking-tight hover:text-[#fd77c4] transition-colors duration-200" href="#">Infrastructure</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-surface-container px-3 py-1.5 rounded flex items-center gap-2 border border-outline-variant/20">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
+<input class="bg-transparent border-none text-sm focus:ring-0 text-on-surface placeholder:text-outline w-48 lg:w-64" placeholder="Search Hash, IP, or Domain..." type="text"/>
+</div>
+<button class="text-[#a7aaba] hover:text-[#fd77c4] active:scale-95 transition-all"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-[#a7aaba] hover:text-[#fd77c4] active:scale-95 transition-all"><span class="material-symbols-outlined">terminal</span></button>
+<div class="w-8 h-8 rounded bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
+<img alt="Cybersecurity Operator Avatar" data-alt="Avatar of a cybersecurity operator with a digital glitch effect and purple neon highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2QaRyfi8Rzr6JA4I5weIaenLVVzFFlYsqnO6ovF22335icNs--0-M583E8fUL8FfxKM0_kTAONnVajHf8mv0io7OVd_NI2gUzJ0GzBVi1WDyX7fxg63McGghgvvqd8trvXxiDlsnjyqrwr_YtgG1quXIZ-pcs4U1OhDSbKxT6JzQUf_r5aVu5PzDdU4yGfvwtNnePQCxH5y_aJ7cR-4wyjtCZK61M60S1i97bpitLVuBkG7UOq-LWCjCTpq3YP-Z22gKgWrrCH_nD"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar Implementation -->
+<aside class="fixed left-0 top-16 bottom-0 flex flex-col py-8 bg-[#0f131f] border-r border-[#c49aff]/10 w-64 z-40 hidden lg:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></div>
+<div>
+<p class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem] text-[#c49aff]">SYNTHETIC_SENTINEL</p>
+<p class="text-[0.6rem] text-[#a7aaba] uppercase tracking-widest">Level 4 Clearance</p>
+</div>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-[#a7aaba] hover:bg-[#141927] hover:text-[#fd77c4] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-[#a7aaba] hover:bg-[#141927] hover:text-[#fd77c4] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Upload</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-[#c49aff] border-r-2 border-[#c49aff] bg-[#c49aff]/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Analysis</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-[#a7aaba] hover:bg-[#141927] hover:text-[#fd77c4] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Sandbox</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-[#a7aaba] hover:bg-[#141927] hover:text-[#fd77c4] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Reports</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-[#a7aaba] hover:bg-[#141927] hover:text-[#fd77c4] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Settings</span>
+</a>
+</div>
+<div class="px-6 pt-8 mt-8 border-t border-outline-variant/10">
+<a class="flex items-center gap-4 py-3 text-[#a7aaba] hover:text-[#fd77c4] transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Support</span>
+</a>
+<a class="flex items-center gap-4 py-3 text-[#a7aaba] hover:text-[#fd77c4] transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-[0.05em] text-[0.75rem]">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="lg:ml-64 mt-16 p-6 space-y-6">
+<!-- Top Row: Threat Score & Globe -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Threat Score Card -->
+<div class="lg:col-span-4 glass-card p-8 rounded-xl relative overflow-hidden flex flex-col items-center justify-center text-center">
+<div class="absolute top-0 right-0 p-4">
+<span class="text-[0.6rem] font-bold uppercase tracking-widest text-error opacity-80">Critical Risk</span>
+</div>
+<div class="relative w-48 h-48 flex items-center justify-center mb-6">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-surface-container-highest" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-error neon-glow-primary" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="553" stroke-dashoffset="44" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-7xl font-bold tracking-tighter text-on-surface">92</span>
+<span class="text-[0.7rem] uppercase tracking-widest text-on-surface-variant">Score</span>
+</div>
+</div>
+<div class="space-y-1">
+<h3 class="text-xl font-bold text-on-surface">Malicious Intent Detected</h3>
+<p class="text-on-surface-variant text-sm">98.4% Confidence Rating</p>
+</div>
+<div class="mt-8 flex gap-3 w-full">
+<button class="flex-1 py-2.5 bg-error text-on-error font-bold rounded-lg active:scale-95 transition-all text-sm uppercase tracking-wider">Quarantine</button>
+<button class="flex-1 py-2.5 border border-outline-variant/30 text-on-surface font-bold rounded-lg hover:bg-surface-variant active:scale-95 transition-all text-sm uppercase tracking-wider">Dismiss</button>
+</div>
+</div>
+<!-- Threat Intelligence Globe -->
+<div class="lg:col-span-8 glass-card rounded-xl relative overflow-hidden flex flex-col md:flex-row">
+<div class="flex-1 relative min-h-[400px]">
+<div class="absolute inset-0 z-0">
+<img alt="Threat Globe" class="w-full h-full object-cover opacity-40 grayscale" data-alt="Stylized 3D digital wireframe globe on a dark background with glowing purple connection arcs and data nodes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5sKckT97zZ1ZkfsTqH6mHjqkvb1g7F0-AFi_kwXQshy_fWXUEM1Zj8U47A5nzhaaDDbtdFhP_Hv13ibV5YnrhpIFA2XO9XfLtQ0U9CrW5VZLdqQX6JJSK8z5DU49Gjc2O5RwVWn6OsRgg0hcI1UXjY13RbOxj6vTA6iikGsQXUyr8RLp_57YWdhN0KEDtZXVWQy5PAri3ekS0nhMXuKg019q06xy-TZVqK5LlXIg0mGBtQ8m6_jxVWMWMpiYeB1UsCMZF0d1gPLQi"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container/80 to-transparent pointer-events-none"></div>
+<div class="absolute top-6 left-6 z-10">
+<div class="bg-surface-container-highest/60 backdrop-blur px-3 py-1 rounded-full flex items-center gap-2 border border-primary/20">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[0.65rem] uppercase font-bold tracking-widest">Active Node Extraction</span>
+</div>
+</div>
+<!-- Location UI -->
+<div class="absolute bottom-6 left-6 z-10 space-y-4 max-w-xs">
+<div class="p-4 glass-card rounded-lg bg-surface-container/60">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-secondary">location_on</span>
+<div>
+<p class="text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Geo-Origin</p>
+<p class="text-lg font-bold">Bucharest, RO</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Latitude</p>
+<p class="font-mono text-xs text-primary">44.4268° N</p>
+</div>
+<div>
+<p class="text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Longitude</p>
+<p class="font-mono text-xs text-primary">26.1025° E</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full md:w-72 border-l border-outline-variant/10 p-6 space-y-6">
+<h4 class="text-[0.7rem] uppercase font-bold tracking-widest text-on-surface-variant">Traffic Analysis</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Source IP</span>
+<span class="font-mono text-xs text-secondary">192.168.44.202</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Target Assets</span>
+<span class="font-mono text-xs text-on-surface">Corporate-HQ</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Protocol</span>
+<span class="font-mono text-xs text-tertiary">HTTPS/2</span>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant/10">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-sm text-secondary">warning</span>
+<span class="text-[0.65rem] uppercase font-bold text-secondary">Pattern Alert</span>
+</div>
+<p class="text-xs leading-relaxed text-on-surface-variant">Anomalous packet sizes detected. Matching known Cobalt Strike beaconing patterns (Profile v4.2).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pipeline Timeline -->
+<div class="glass-card p-6 rounded-xl overflow-x-auto">
+<h3 class="text-[0.7rem] uppercase font-bold tracking-widest text-on-surface-variant mb-8 px-2">Analysis Execution Pipeline</h3>
+<div class="flex items-center justify-between min-w-[800px] relative px-4">
+<!-- Connecting Line -->
+<div class="absolute h-0.5 left-12 right-12 top-6 bg-outline-variant/20 -z-10">
+<div class="absolute h-full left-0 w-3/4 bg-primary neon-glow-primary"></div>
+</div>
+<!-- Step 1 -->
+<div class="flex flex-col items-center gap-3 w-32">
+<div class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_0_15px_rgba(196,154,255,0.3)]">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div class="text-center">
+<p class="text-xs font-bold text-on-surface">Header Analysis</p>
+<p class="text-[0.65rem] text-tertiary">COMPLETE</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center gap-3 w-32">
+<div class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_0_15px_rgba(196,154,255,0.3)]">
+<span class="material-symbols-outlined">policy</span>
+</div>
+<div class="text-center">
+<p class="text-xs font-bold text-on-surface">IOC Extraction</p>
+<p class="text-[0.65rem] text-tertiary">COMPLETE</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center gap-3 w-32">
+<div class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_0_15px_rgba(196,154,255,0.3)]">
+<span class="material-symbols-outlined">link</span>
+</div>
+<div class="text-center">
+<p class="text-xs font-bold text-on-surface">URL Scan</p>
+<p class="text-[0.65rem] text-tertiary">COMPLETE</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center gap-3 w-32">
+<div class="w-12 h-12 rounded-full bg-surface-container border-2 border-primary text-primary flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined">attach_file</span>
+</div>
+<div class="text-center">
+<p class="text-xs font-bold text-on-surface">Attachment Scan</p>
+<p class="text-[0.65rem] text-primary">PROCESSING</p>
+</div>
+</div>
+<!-- Step 5 -->
+<div class="flex flex-col items-center gap-3 w-32">
+<div class="w-12 h-12 rounded-full bg-surface-container border-2 border-outline-variant/30 text-outline flex items-center justify-center">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<div class="text-center">
+<p class="text-xs font-bold text-on-surface-variant">Sandbox Detonation</p>
+<p class="text-[0.65rem] text-outline">PENDING</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Analysis Details Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Network Assets -->
+<div class="surface-container p-6 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all group">
+<div class="flex items-center justify-between mb-4">
+<h5 class="text-[0.65rem] uppercase font-bold tracking-widest text-on-surface-variant">Network Assets</h5>
+<span class="material-symbols-outlined text-primary text-xl">language</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/5">
+<p class="text-xs text-secondary font-mono">185.112.144.10</p>
+<p class="text-[0.65rem] text-on-surface-variant">TCP/443 (TLS)</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/5">
+<p class="text-xs text-on-surface font-mono">10.0.4.122</p>
+<p class="text-[0.65rem] text-on-surface-variant">Local Target</p>
+</div>
+</div>
+</div>
+<!-- Domains & URLs -->
+<div class="surface-container p-6 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all">
+<div class="flex items-center justify-between mb-4">
+<h5 class="text-[0.65rem] uppercase font-bold tracking-widest text-on-surface-variant">Domains &amp; URLs</h5>
+<span class="material-symbols-outlined text-secondary text-xl">link</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/5">
+<p class="text-xs text-on-surface truncate">secure-login-portal.ro/auth</p>
+<p class="text-[0.65rem] text-error font-bold">BLACKLISTED</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/5">
+<p class="text-xs text-on-surface truncate">updates.microsoft.com.cdn.ro</p>
+<p class="text-[0.65rem] text-error-dim font-bold">SUSPICIOUS (Typosquat)</p>
+</div>
+</div>
+</div>
+<!-- File Hashes -->
+<div class="surface-container p-6 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all">
+<div class="flex items-center justify-between mb-4">
+<h5 class="text-[0.65rem] uppercase font-bold tracking-widest text-on-surface-variant">File Hashes</h5>
+<span class="material-symbols-outlined text-tertiary text-xl">fingerprint</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/5">
+<p class="text-[0.6rem] text-on-surface-variant uppercase">SHA-256</p>
+<p class="text-[0.65rem] font-mono text-on-surface break-all">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</p>
+</div>
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/5">
+<p class="text-[0.6rem] text-on-surface-variant uppercase">MD5</p>
+<p class="text-[0.65rem] font-mono text-on-surface">d41d8cd98f00b204e9800998ecf8427e</p>
+</div>
+</div>
+</div>
+<!-- MITRE ATT&CK -->
+<div class="surface-container p-6 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all">
+<div class="flex items-center justify-between mb-4">
+<h5 class="text-[0.65rem] uppercase font-bold tracking-widest text-on-surface-variant">MITRE ATT&amp;CK</h5>
+<span class="material-symbols-outlined text-on-surface text-xl">grid_view</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-secondary/10 text-secondary text-[0.6rem] font-bold px-2 py-1 rounded border border-secondary/20">T1566: Phishing</span>
+<span class="bg-secondary/10 text-secondary text-[0.6rem] font-bold px-2 py-1 rounded border border-secondary/20">T1204: User Execution</span>
+<span class="bg-primary/10 text-primary text-[0.6rem] font-bold px-2 py-1 rounded border border-primary/20">T1071: C2 Channels</span>
+<span class="bg-primary/10 text-primary text-[0.6rem] font-bold px-2 py-1 rounded border border-primary/20">T1027: Obfuscation</span>
+</div>
+</div>
+</div>
+<!-- Live Logs Terminal -->
+<div class="glass-card rounded-xl overflow-hidden mt-8">
+<div class="bg-surface-container-high px-4 py-2 flex items-center justify-between border-b border-outline-variant/10">
+<div class="flex items-center gap-2">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-error/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-tertiary/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary/40"></div>
+</div>
+<span class="text-[0.6rem] font-mono text-on-surface-variant ml-4 tracking-widest uppercase">system_audit_logs :: v2.4.0</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[0.6rem] font-mono text-tertiary">STREAMING...</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">download</span>
+</div>
+</div>
+<div class="p-6 h-64 bg-surface-container-lowest font-mono text-xs overflow-y-auto relative">
+<div class="space-y-1">
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:01]</span> <span class="text-secondary">SYSTEM:</span> Initializing analysis engine for core_engine_04...</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:03]</span> <span class="text-secondary">PROCESS:</span> Loading threat heuristics module (ver_8.1)...</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:05]</span> <span class="text-tertiary">SUCCESS:</span> TLS Handshake verified. Decrypting payload stream...</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:08]</span> <span class="text-error">ALERT:</span> Potential beaconing pattern detected at 185.112.144.10:443</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:09]</span> <span class="text-error">ALERT:</span> Suspicious string 'powershell -enc' found in binary attachment.</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:12]</span> <span class="text-secondary">SCAN:</span> Static analysis of 'invoice_9921.xlsm' completed with 12 detections.</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:15]</span> <span class="text-secondary">SYSTEM:</span> Calculating final threat score based on ML model_delta_v9...</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:16]</span> <span class="text-on-surface">TRACE:</span> Thread[1422] waiting for sandbox detonation signal...</p>
+<p class="text-on-surface-variant"><span class="text-primary">[2023-11-24 14:22:18]</span> <span class="text-on-surface animate-pulse">_</span></p>
+</div>
+<div class="absolute inset-x-0 bottom-0 h-16 terminal-fade pointer-events-none"></div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Suppressing as per mandate for Detail View) -->
+</body></html>
