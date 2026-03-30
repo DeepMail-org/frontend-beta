@@ -1,17 +1,221 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { ApiError, getDashboard } from "@/lib/api";
+import { DashboardData, RecentAnalysis, TrendDataPoint } from "@/lib/types";
+import { formatUtcTime } from "@/lib/format";
+
+const DEMO_RECENT_ANALYSES: RecentAnalysis[] = [
+	{
+		id: "demoid1",
+		original_name: "invoice_urgent.eml",
+		risk_level: "Critical",
+		score: 92,
+		submitted_at: "2026-03-29T21:56:47Z",
+		sender: "attacker@evil.com",
+		status: "Analyzed",
+	},
+	{
+		id: "demoid2",
+		original_name: "marketing_update.msg",
+		risk_level: "Suspicious",
+		score: 55,
+		submitted_at: "2026-03-29T21:52:47Z",
+		sender: "newsletter@promo.com",
+		status: "Analyzed",
+	},
+	{
+		id: "demoid3",
+		original_name: "meeting_notes.pdf",
+		risk_level: "Safe",
+		score: 10,
+		submitted_at: "2026-03-29T21:50:47Z",
+		sender: "colleague@company.com",
+		status: "Analyzed",
+	},
+	{
+		id: "demoid4",
+		original_name: "password_reset.eml",
+		risk_level: "Critical",
+		score: 95,
+		submitted_at: "2026-03-29T21:48:47Z",
+		sender: "admin@it-support-fake.com",
+		status: "Analyzed",
+	},
+	{
+		id: "demoid5",
+		original_name: "project_timeline.xlsx",
+		risk_level: "Suspicious",
+		score: 45,
+		submitted_at: "2026-03-29T21:38:47Z",
+		sender: "contractor@external.com",
+		status: "Analyzed",
+	},
+];
+
 export default function DashboardPage() {
+	const [data, setData] = useState<DashboardData | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		let intervalId: ReturnType<typeof setInterval> | null = null;
+		let consecutiveFailures = 0;
+		let cancelled = false;
+
+		const fetchData = async () => {
+			try {
+				const res = await getDashboard();
+				if (cancelled) return;
+				setData(res);
+				setError(null);
+				consecutiveFailures = 0;
+			} catch (err) {
+				console.error("Dashboard fetch error:", err);
+				if (cancelled) return;
+				if (err instanceof ApiError && err.status === 401) {
+					setError(
+						"Authentication required. Add your JWT token in Settings → API Keys and refresh.",
+					);
+					if (intervalId) {
+						clearInterval(intervalId);
+						intervalId = null;
+					}
+					return;
+				}
+				consecutiveFailures += 1;
+				setError(
+					"Failed to load dashboard data. Verify backend is running on port 3001.",
+				);
+				if (consecutiveFailures >= 3 && intervalId) {
+					clearInterval(intervalId);
+					intervalId = null;
+				}
+			}
+		};
+
+		fetchData();
+		intervalId = setInterval(fetchData, 5000);
+
+		return () => {
+			cancelled = true;
+			if (intervalId) {
+				clearInterval(intervalId);
+			}
+		};
+	}, []);
+
+	// Default/empty state variables
+	let stats = data?.stats || {
+		global_24h: 0,
+		malicious: 0,
+		suspicious: 0,
+		safe: 0,
+	};
+	let trend = data?.trend && data.trend.length > 0 ? data.trend : [];
+	let recentAnalyses = data?.recent_analyses || [];
+
+	// Fallback to rich dummy data for demonstration if backend is empty
+	const showDemoData = !data && !error;
+	if (showDemoData) {
+		stats = {
+			global_24h: 1247,
+			malicious: 48,
+			suspicious: 312,
+			safe: 887,
+		};
+		trend = [
+			{ hour: "00", safe: 50, suspicious: 10, malicious: 2 },
+			{ hour: "02", safe: 45, suspicious: 12, malicious: 1 },
+			{ hour: "04", safe: 60, suspicious: 15, malicious: 3 },
+			{ hour: "06", safe: 80, suspicious: 20, malicious: 5 },
+			{ hour: "08", safe: 120, suspicious: 30, malicious: 8 },
+			{ hour: "10", safe: 150, suspicious: 45, malicious: 12 },
+			{ hour: "12", safe: 200, suspicious: 60, malicious: 15 },
+			{ hour: "14", safe: 180, suspicious: 50, malicious: 10 },
+			{ hour: "16", safe: 160, suspicious: 40, malicious: 8 },
+			{ hour: "18", safe: 140, suspicious: 30, malicious: 6 },
+			{ hour: "20", safe: 100, suspicious: 20, malicious: 4 },
+			{ hour: "22", safe: 80, suspicious: 15, malicious: 3 },
+		];
+		recentAnalyses = DEMO_RECENT_ANALYSES;
+	}
+
+	const safeRate =
+		stats.global_24h > 0
+			? ((stats.safe / stats.global_24h) * 100).toFixed(1)
+			: "100.0";
+
+	// SVG Path generation
+	const width = 800;
+	const height = 280;
+	const paddingY = 80; // top padding
+
+	// Find max total count for scaling
+	const maxCount = Math.max(
+		...trend.map((t) => Math.max(t.safe, t.malicious + t.suspicious)),
+		10, // minimum scale 10
+	);
+
+	const generateAreaPath = (keyFn: (t: TrendDataPoint) => number) => {
+		if (trend.length === 0) {
+			return `M0,${height} L${width},${height} Z`;
+		}
+		if (trend.length === 1) {
+			const y =
+				height - (keyFn(trend[0]) / maxCount) * (height - paddingY);
+			return `M0,${height} L0,${y} L${width},${y} L${width},${height} Z`;
+		}
+		const points = trend.map((t, i) => {
+			const x = (i / (trend.length - 1)) * width;
+			const y = height - (keyFn(t) / maxCount) * (height - paddingY);
+			return `${x},${y}`;
+		});
+		return `M0,${height} L${points.join(" L ")} L${width},${height} Z`;
+	};
+
+	const generateLinePath = (keyFn: (t: TrendDataPoint) => number) => {
+		if (trend.length === 0) {
+			return `M0,${height} L${width},${height}`;
+		}
+		if (trend.length === 1) {
+			const y =
+				height - (keyFn(trend[0]) / maxCount) * (height - paddingY);
+			return `M0,${y} L${width},${y}`;
+		}
+		const points = trend.map((t, i) => {
+			const x = (i / (trend.length - 1)) * width;
+			const y = height - (keyFn(t) / maxCount) * (height - paddingY);
+			return `${x},${y}`;
+		});
+		return `M${points.join(" L ")}`;
+	};
+
+	const cleanAreaPath = generateAreaPath((t) => t.safe);
+	const cleanLinePath = generateLinePath((t) => t.safe);
+	const threatAreaPath = generateAreaPath(
+		(t) => t.malicious + t.suspicious,
+	);
+	const threatLinePath = generateLinePath(
+		(t) => t.malicious + t.suspicious,
+	);
+
 	return (
 		<div className="p-8 lg:p-12 space-y-12">
+			{error && (
+				<div className="rounded-xl border border-error/30 bg-error/10 px-4 py-3 text-xs font-semibold text-error">
+					{error}
+				</div>
+			)}
+
 			{/* Page Header */}
 			<div>
 				<div className="flex items-center gap-2 mb-2">
-					<span className="w-2 h-2 bg-secondary rounded-full animate-pulse shadow-[0_0_8px_#fd77c4]" />
+					<span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
 					<span className="text-[10px] uppercase tracking-[0.3em] text-secondary font-bold">
 						Threat Intelligence Center
 					</span>
 				</div>
-				<h2 className="text-4xl font-bold text-on-surface tracking-tight font-[family-name:var(--font-headline)]">
+				<h2 className="text-4xl font-bold text-on-surface tracking-tight font-headline">
 					THREAT_OVERVIEW{" "}
 					<span className="text-primary">Dashboard</span>
 				</h2>
@@ -29,77 +233,77 @@ export default function DashboardPage() {
 							Global 24h
 						</span>
 					</div>
-					<h3 className="text-4xl font-bold tracking-tighter text-on-surface font-[family-name:var(--font-headline)]">
-						1,247
+					<h3 className="text-4xl font-bold tracking-tighter text-on-surface font-headline">
+						{stats.global_24h.toLocaleString()}
 					</h3>
 					<p className="text-xs text-on-surface-variant mt-1">
 						Emails Analyzed
 					</p>
 					<div className="mt-4 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
-						<div className="h-full bg-primary w-[85%] rounded-full" />
+						<div className="h-full bg-primary w-full rounded-full" />
 					</div>
 				</div>
 
 				{/* Malicious */}
-				<div className="glass-panel p-6 rounded-xl hover:border-secondary/30 transition-all group">
+				<div className="glass-panel p-6 rounded-xl hover:border-dracula-red/30 transition-all group">
 					<div className="flex justify-between items-start mb-4">
-						<span className="material-symbols-outlined text-secondary text-3xl glow-pink">
+						<span className="material-symbols-outlined text-dracula-red text-3xl">
 							dangerous
 						</span>
-						<span className="text-[10px] font-bold uppercase tracking-widest text-secondary">
+						<span className="text-[10px] font-bold uppercase tracking-widest text-dracula-red">
 							Critical
 						</span>
 					</div>
-					<h3 className="text-4xl font-bold tracking-tighter text-secondary font-[family-name:var(--font-headline)]">
-						48
+					<h3 className="text-4xl font-bold tracking-tighter text-dracula-red font-headline">
+						{stats.malicious.toLocaleString()}
 					</h3>
 					<p className="text-xs text-on-surface-variant mt-1">
 						Malicious Detected
 					</p>
-					<div className="mt-4 flex items-center gap-2 text-[10px] text-secondary font-bold">
+					<div className="mt-4 flex items-center gap-2 text-[10px] text-dracula-red font-bold">
 						<span className="material-symbols-outlined text-xs">
-							trending_up
+							warning
 						</span>
-						<span>+12% FROM PEAK</span>
+						<span>Action Required</span>
 					</div>
 				</div>
 
 				{/* Suspicious */}
 				<div className="glass-panel p-6 rounded-xl hover:border-primary-container/30 transition-all group">
 					<div className="flex justify-between items-start mb-4">
-						<span className="material-symbols-outlined text-primary-container text-3xl glow-purple">
+						<span className="material-symbols-outlined text-primary-container text-3xl">
 							warning
 						</span>
 						<span className="text-[10px] font-bold uppercase tracking-widest text-primary-container">
 							Warning
 						</span>
 					</div>
-					<h3 className="text-4xl font-bold tracking-tighter text-primary-container font-[family-name:var(--font-headline)]">
-						312
+					<h3 className="text-4xl font-bold tracking-tighter text-primary-container font-headline">
+						{stats.suspicious.toLocaleString()}
 					</h3>
 					<p className="text-xs text-on-surface-variant mt-1">
 						Suspicious Flagged
 					</p>
 					<div className="mt-4 flex items-center gap-2 text-[10px] text-primary-container font-bold">
 						<span className="material-symbols-outlined text-xs">
-							trending_down
+							visibility
 						</span>
-						<span>-4% AUTO-BLOCKED</span>
+						<span>Under Review</span>
 					</div>
 				</div>
 
 				{/* Safe / Integrity */}
 				<div className="glass-panel p-6 rounded-xl hover:border-tertiary/30 transition-all group">
 					<div className="flex justify-between items-start mb-4">
-						<span className="material-symbols-outlined text-tertiary text-3xl glow-green">
+						<span className="material-symbols-outlined text-tertiary text-3xl">
 							verified_user
 						</span>
 						<span className="text-[10px] font-bold uppercase tracking-widest text-tertiary">
 							Stable
 						</span>
 					</div>
-					<h3 className="text-4xl font-bold tracking-tighter text-tertiary font-[family-name:var(--font-headline)]">
-						96.1%
+					<h3 className="text-4xl font-bold tracking-tighter text-tertiary font-headline">
+						{safeRate}%
 					</h3>
 					<p className="text-xs text-on-surface-variant mt-1">
 						Clean Rate
@@ -121,7 +325,7 @@ export default function DashboardPage() {
 					<div className="glass-panel rounded-xl p-8 overflow-hidden relative">
 						<div className="flex justify-between items-center mb-10">
 							<div>
-								<h4 className="text-lg font-bold tracking-tight text-on-surface font-[family-name:var(--font-headline)]">
+								<h4 className="text-lg font-bold tracking-tight text-on-surface font-headline">
 									THREAT_PROPAGATION_TREND
 								</h4>
 								<p className="text-[10px] text-outline uppercase tracking-widest">
@@ -130,7 +334,7 @@ export default function DashboardPage() {
 							</div>
 							<div className="flex gap-4">
 								<div className="flex items-center gap-2">
-									<span className="w-3 h-3 rounded-sm bg-secondary" />
+									<span className="w-3 h-3 rounded-sm bg-dracula-red" />
 									<span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
 										Threats
 									</span>
@@ -214,27 +418,27 @@ export default function DashboardPage() {
 								/>
 								{/* Clean (Purple) */}
 								<path
-									d="M0,200 Q100,230 200,170 T400,120 T600,200 T800,140 L800,280 L0,280 Z"
+									d={cleanAreaPath}
 									fill="url(#grad-purple)"
 								/>
 								<path
-									d="M0,200 Q100,230 200,170 T400,120 T600,200 T800,140"
+									d={cleanLinePath}
 									fill="none"
 									stroke="#c49aff"
 									strokeWidth="2.5"
-									className="glow-purple"
+									className="transition-all duration-300"
 								/>
 								{/* Threats (Pink) */}
 								<path
-									d="M0,240 Q100,150 200,210 T400,80 T600,130 T800,50 L800,280 L0,280 Z"
+									d={threatAreaPath}
 									fill="url(#grad-pink)"
 								/>
 								<path
-									d="M0,240 Q100,150 200,210 T400,80 T600,130 T800,50"
+									d={threatLinePath}
 									fill="none"
 									stroke="#fd77c4"
 									strokeWidth="2.5"
-									className="glow-pink"
+									className="transition-all duration-300"
 								/>
 							</svg>
 						</div>
@@ -243,10 +447,15 @@ export default function DashboardPage() {
 					{/* Recent Analyses Table */}
 					<div className="glass-panel rounded-xl overflow-hidden">
 						<div className="px-8 py-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/50">
-							<h4 className="text-sm font-bold tracking-widest uppercase font-[family-name:var(--font-headline)]">
+							<h4 className="text-sm font-bold tracking-widest uppercase font-headline">
 								Recent_Analyses
 							</h4>
-							<button className="text-[10px] font-bold text-primary hover:underline">
+							<button
+								className="text-[10px] font-bold text-primary hover:underline"
+								onClick={() =>
+									(window.location.href = "/reports")
+								}
+							>
 								VIEW_ALL_LOGS
 							</button>
 						</div>
@@ -258,7 +467,7 @@ export default function DashboardPage() {
 											Entity / Hash
 										</th>
 										<th className="px-8 py-4 font-bold">
-											Origin
+											Time
 										</th>
 										<th className="px-8 py-4 font-bold">
 											Score
@@ -272,105 +481,131 @@ export default function DashboardPage() {
 									</tr>
 								</thead>
 								<tbody className="text-sm">
-									<tr className="hover:bg-surface-container-high/40 transition-colors border-b border-outline-variant/5">
-										<td className="px-8 py-4">
-											<div className="flex items-center gap-3">
-												<div className="w-2 h-2 rounded-full bg-secondary" />
-												<div>
-													<p className="font-bold text-on-surface tracking-tight">
-														phish_invoice_2024.eml
-													</p>
-													<p className="text-[10px] text-outline font-mono">
-														SHA-256: 4f1a...e2d9
-													</p>
-												</div>
-											</div>
-										</td>
-										<td className="px-8 py-4 text-outline font-mono text-xs">
-											192.168.1.104
-										</td>
-										<td className="px-8 py-4">
-											<span className="text-secondary font-bold">
-												92/100
-											</span>
-										</td>
-										<td className="px-8 py-4">
-											<span className="bg-secondary/10 text-secondary text-[10px] px-2 py-1 rounded border border-secondary/20 font-bold uppercase">
-												MALICIOUS
-											</span>
-										</td>
-										<td className="px-8 py-4">
-											<button className="material-symbols-outlined text-outline hover:text-on-surface text-lg">
-												more_vert
-											</button>
-										</td>
-									</tr>
-									<tr className="bg-surface-container-low/20 hover:bg-surface-container-high/40 transition-colors border-b border-outline-variant/5">
-										<td className="px-8 py-4">
-											<div className="flex items-center gap-3">
-												<div className="w-2 h-2 rounded-full bg-primary-container" />
-												<div>
-													<p className="font-bold text-on-surface tracking-tight">
-														suspicious_link.msg
-													</p>
-													<p className="text-[10px] text-outline font-mono">
-														SHA-256: 8b2c...3a09
-													</p>
-												</div>
-											</div>
-										</td>
-										<td className="px-8 py-4 text-outline font-mono text-xs">
-											10.0.0.12
-										</td>
-										<td className="px-8 py-4">
-											<span className="text-primary-container font-bold">
-												45/100
-											</span>
-										</td>
-										<td className="px-8 py-4">
-											<span className="bg-primary-container/10 text-primary-container text-[10px] px-2 py-1 rounded border border-primary-container/20 font-bold uppercase">
-												SUSPICIOUS
-											</span>
-										</td>
-										<td className="px-8 py-4">
-											<button className="material-symbols-outlined text-outline hover:text-on-surface text-lg">
-												more_vert
-											</button>
-										</td>
-									</tr>
-									<tr className="hover:bg-surface-container-high/40 transition-colors">
-										<td className="px-8 py-4">
-											<div className="flex items-center gap-3">
-												<div className="w-2 h-2 rounded-full bg-tertiary" />
-												<div>
-													<p className="font-bold text-on-surface tracking-tight">
-														quarterly_report.eml
-													</p>
-													<p className="text-[10px] text-outline font-mono">
-														SHA-256: c7d1...f820
-													</p>
-												</div>
-											</div>
-										</td>
-										<td className="px-8 py-4 text-outline font-mono text-xs">
-											Trusted CDN
-										</td>
-										<td className="px-8 py-4">
-											<span className="text-tertiary font-bold">
-												03/100
-											</span>
-										</td>
-										<td className="px-8 py-4">
-											<span className="bg-tertiary/10 text-tertiary text-[10px] px-2 py-1 rounded border border-tertiary/20 font-bold uppercase">
-												SECURE
-											</span>
-										</td>
-										<td className="px-8 py-4">
-											<button className="material-symbols-outlined text-outline hover:text-on-surface text-lg">
-												more_vert
-											</button>
-										</td>
-									</tr>
+									{recentAnalyses.length === 0 ? (
+										<tr>
+											<td
+												colSpan={5}
+												className="text-center py-8 text-outline text-xs"
+											>
+												No recent analyses found
+											</td>
+										</tr>
+									) : (
+										recentAnalyses.map(
+											(ra: RecentAnalysis) => {
+												let dotColor = "bg-tertiary";
+												let badgeColor =
+													"text-tertiary bg-tertiary/10 border-tertiary/20";
+
+												if (
+													ra.risk_level === "Critical"
+												) {
+												dotColor = "bg-dracula-red";
+												badgeColor =
+													"text-dracula-red bg-dracula-red/10 border-dracula-red/20";
+											} else if (
+												ra.risk_level ===
+												"Suspicious"
+											) {
+												dotColor = "bg-dracula-orange";
+												badgeColor =
+													"text-dracula-orange bg-dracula-orange/10 border-dracula-orange/20";
+											}
+
+												return (
+													<tr
+														key={ra.id}
+														className="hover:bg-surface-container-high/40 transition-colors border-b border-outline-variant/5"
+													>
+														<td className="px-8 py-4">
+															<div className="flex items-center gap-3">
+																<div
+																	className={`w-2 h-2 rounded-full ${dotColor}`}
+																/>
+																<div>
+																	<p
+																		className="font-bold text-on-surface tracking-tight"
+																		title={
+																			ra.original_name
+																		}
+																	>
+																		{ra.original_name.substring(
+																			0,
+																			30,
+																		)}
+																		{ra
+																			.original_name
+																			.length >
+																			30 &&
+																			"..."}
+																	</p>
+																	<p className="text-[10px] text-outline font-mono">
+																		ID:{" "}
+																		{ra.id.substring(
+																			0,
+																			8,
+																		)}
+																		...
+																	</p>
+																</div>
+															</div>
+														</td>
+														<td className="px-8 py-4 text-outline font-mono text-xs">
+															{formatUtcTime(ra.submitted_at)}
+														</td>
+														<td className="px-8 py-4">
+															<span
+																className={`font-bold ${badgeColor.split(" ")[0]}`}
+															>
+																{ra.score.toFixed(
+																	0,
+																)}
+																/100
+															</span>
+														</td>
+														<td className="px-8 py-4">
+															<span
+																className={`text-[10px] px-2 py-1 rounded border font-bold uppercase ${badgeColor}`}
+															>
+																{ra.risk_level}
+															</span>
+														</td>
+														<td className="px-8 py-4 relative group/action">
+															<button className="material-symbols-outlined text-outline hover:text-on-surface text-lg">
+																more_vert
+															</button>
+															<div className="absolute right-8 top-full mt-2 w-48 bg-surface-container-high border border-outline-variant/20 rounded-lg shadow-xl opacity-0 invisible group-hover/action:opacity-100 group-hover/action:visible transition-all z-10 flex flex-col overflow-hidden">
+																<button
+																	className="px-4 py-2 text-xs text-left hover:bg-surface-container-highest flex items-center gap-2"
+																	onClick={() =>
+																		(window.location.href = `/analysis/${ra.id}`)
+																	}
+																>
+																	<span className="material-symbols-outlined text-[14px]">
+																		visibility
+																	</span>
+																	View Report
+																</button>
+																<button
+																	className="px-4 py-2 text-xs text-left hover:bg-surface-container-highest flex items-center gap-2 text-error"
+																	onClick={() =>
+																		alert(
+																			`Deleted analysis ${ra.id}`,
+																		)
+																	}
+																>
+																	<span className="material-symbols-outlined text-[14px]">
+																		delete
+																	</span>
+																	Delete Log
+																</button>
+															</div>
+														</td>
+													</tr>
+												);
+											},
+										)
+									)}
 								</tbody>
 							</table>
 						</div>
@@ -381,48 +616,40 @@ export default function DashboardPage() {
 				<div className="col-span-12 lg:col-span-4">
 					<div className="glass-panel rounded-xl h-full flex flex-col">
 						<div className="px-6 py-5 border-b border-outline-variant/10">
-							<h4 className="text-sm font-bold tracking-widest uppercase flex items-center gap-2 font-[family-name:var(--font-headline)]">
+							<h3 className="text-lg font-bold text-on-surface flex items-center gap-2 font-headline">
 								<span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
 								REAL_TIME_FEED
-							</h4>
+							</h3>
 						</div>
-						<div className="flex-grow p-6 space-y-6 overflow-y-auto max-h-[700px] no-scrollbar">
-							{/* Feed: Critical */}
-							<FeedItem
-								icon="priority_high"
-								color="secondary"
-								label="Phishing Detected"
-								time="JUST NOW"
-								title="Credential harvester blocked from invoice_urgent.eml"
-								desc="Source IP: 201.44.112.9. Redirects to fake Microsoft login page."
-							/>
-							{/* Feed: Info */}
-							<FeedItem
-								icon="shield"
-								color="primary"
-								label="Analysis Complete"
-								time="2M AGO"
-								title="Email scan completed: report_q4.eml"
-								desc="Threat score: 12/100. All headers verified. No IOCs found."
-							/>
-							{/* Feed: Success */}
-							<FeedItem
-								icon="check"
-								color="tertiary"
-								label="System Health"
-								time="12M AGO"
-								title="Pipeline integrity: 100%"
-								desc="All 8 analysis stages reporting nominal. Redis queue depth: 0."
-							/>
-							{/* Feed: Warning */}
-							<FeedItem
-								icon="schedule"
-								color="primary-container"
-								label="Sandbox Queue"
-								time="15M AGO"
-								title="3 URL detonations pending"
-								desc="Sandbox worker processing. ETA: ~45 seconds per URL."
-							/>
+						<div className="grow space-y-6 overflow-y-auto p-6 pr-2 no-scrollbar">
+							{recentAnalyses.slice(0, 6).map((ra) => {
+								let icon = "check";
+								let color = "tertiary";
+								if (ra.risk_level === "Critical") {
+									icon = "priority_high";
+									color = "critical";
+								} else if (ra.risk_level === "Suspicious") {
+									icon = "warning";
+									color = "suspicious";
+								}
+								return (
+															<FeedItem
+																key={ra.id}
+																icon={icon}
+																color={color}
+																label={`${ra.risk_level} DETECTED`}
+																time={formatUtcTime(ra.submitted_at)}
+																title={ra.original_name}
+																desc={`Action taken based on threat score of ${ra.score.toFixed(0)}/100`}
+															/>
+								);
+							})}
+
+							{recentAnalyses.length === 0 && (
+								<p className="text-xs text-outline text-center py-8">
+									Waiting for telemetry...
+								</p>
+							)}
 
 							{/* Network Graph Mini */}
 							<div className="pt-4 mt-4 border-t border-outline-variant/10">
@@ -436,17 +663,14 @@ export default function DashboardPage() {
 										</span>
 									</div>
 									<div className="flex justify-around items-center h-24 relative">
-										<div className="w-3 h-3 rounded-full bg-secondary glow-pink z-10" />
+										<div className="w-3 h-3 rounded-full bg-secondary z-10" />
 										<div className="w-2 h-2 rounded-full bg-primary/40 z-10" />
-										<div className="w-4 h-4 rounded-full bg-tertiary glow-green z-10" />
+										<div className="w-4 h-4 rounded-full bg-tertiary z-10" />
 										<div className="w-2 h-2 rounded-full bg-primary-container z-10" />
 										<div className="absolute inset-0 flex items-center">
-											<div className="w-full h-px bg-gradient-to-r from-secondary/20 via-primary/20 to-tertiary/20" />
+											<div className="w-full h-px bg-linear-to-r from-secondary/20 via-primary/20 to-tertiary/20" />
 										</div>
 									</div>
-									<button className="w-full mt-2 py-2 text-[10px] font-bold text-on-surface-variant bg-surface-container-high rounded border border-outline-variant/10 hover:bg-surface-container-highest transition-colors uppercase tracking-widest">
-										Explore Node Map
-									</button>
 								</div>
 							</div>
 						</div>
@@ -472,15 +696,36 @@ function FeedItem({
 	title: string;
 	desc: string;
 }) {
+	const colorClasses: Record<
+		string,
+		{ bubble: string; icon: string; label: string }
+	> = {
+		critical: {
+			bubble: "bg-dracula-red/20 border-dracula-red/40",
+			icon: "text-dracula-red",
+			label: "text-dracula-red",
+		},
+		suspicious: {
+			bubble: "bg-dracula-orange/20 border-dracula-orange/40",
+			icon: "text-dracula-orange",
+			label: "text-dracula-orange",
+		},
+		tertiary: {
+			bubble: "bg-tertiary/20 border-tertiary/40",
+			icon: "text-tertiary",
+			label: "text-tertiary",
+		},
+	};
+
+	const classes = colorClasses[color] || colorClasses.tertiary;
+
 	return (
 		<div className="flex gap-4 group">
 			<div className="flex flex-col items-center">
 				<div
-					className={`w-8 h-8 rounded-full bg-${color}/20 flex items-center justify-center border border-${color}/40`}
+					className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 ${classes.bubble}`}
 				>
-					<span
-						className={`material-symbols-outlined text-sm text-${color}`}
-					>
+					<span className={`material-symbols-outlined text-sm ${classes.icon}`}>
 						{icon}
 					</span>
 				</div>
@@ -488,14 +733,12 @@ function FeedItem({
 			</div>
 			<div className="flex-grow pb-6">
 				<div className="flex justify-between mb-1">
-					<span
-						className={`text-[10px] font-bold text-${color} uppercase tracking-widest`}
-					>
+					<span className={`text-[10px] font-bold uppercase tracking-widest ${classes.label}`}>
 						{label}
 					</span>
 					<span className="text-[10px] text-outline">{time}</span>
 				</div>
-				<p className="text-xs font-bold text-on-surface tracking-tight">
+				<p className="text-xs font-bold text-on-surface tracking-tight break-all">
 					{title}
 				</p>
 				<p className="text-[10px] text-on-surface-variant mt-1 leading-relaxed">

@@ -28,10 +28,10 @@
 	--color-on-primary-container: #320067;
 
 	/* Secondary (Dracula Pink) */
-	--color-secondary: #fd77c4;
-	--color-secondary-dim: #f36fbc;
-	--color-secondary-container: #860f60;
-	--color-on-secondary: #520039;
+	--color-secondary: #ff5555;
+	--color-secondary-dim: #ff6e6e;
+	--color-secondary-container: #8b0000;
+	--color-on-secondary: #ffffff;
 
 	/* Tertiary (Dracula Green) */
 	--color-tertiary: #b8ffbb;
@@ -47,10 +47,10 @@
 
 	/* On-surface */
 	--color-on-surface: #e8eafb;
-	--color-on-surface-variant: #a7aaba;
+	--color-on-surface-variant: #ffffff;
+	--color-outline: #dde1ec;
+	--color-outline-variant: #a0a8c4;
 	--color-on-background: #e8eafb;
-	--color-outline: #717583;
-	--color-outline-variant: #444855;
 	--color-inverse-surface: #faf8ff;
 	--color-inverse-on-surface: #515562;
 	--color-inverse-primary: #724aaa;
@@ -66,7 +66,9 @@
 
 	/* Typography */
 	--font-headline: "Space Grotesk", system-ui, sans-serif;
-	--font-body: "Inter", system-ui, sans-serif;
+	--font-body:
+		"JetBrainsMono Nerd Font Propo", "JetBrainsMono NF Propo",
+		"JetBrains Mono", monospace;
 	--font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
@@ -119,36 +121,19 @@ body {
 }
 
 .neon-border-purple {
-	box-shadow: 0 0 15px rgba(196, 154, 255, 0.2);
 	border: 1px solid rgba(196, 154, 255, 0.4);
 }
 
 .neon-border-pink {
-	box-shadow: 0 0 15px rgba(253, 119, 196, 0.2);
 	border: 1px solid rgba(253, 119, 196, 0.4);
 }
 
 .neon-border-green {
-	box-shadow: 0 0 15px rgba(80, 250, 123, 0.2);
 	border: 1px solid rgba(80, 250, 123, 0.4);
 }
 
 .neon-border-red {
-	box-shadow: 0 0 15px rgba(255, 110, 132, 0.15);
 	border: 1px solid rgba(255, 110, 132, 0.4);
-}
-
-.glow-purple {
-	filter: drop-shadow(0 0 10px rgba(189, 147, 249, 0.6));
-}
-.glow-pink {
-	filter: drop-shadow(0 0 8px rgba(255, 121, 198, 0.5));
-}
-.glow-green {
-	filter: drop-shadow(0 0 8px rgba(80, 250, 123, 0.5));
-}
-.glow-red {
-	filter: drop-shadow(0 0 8px rgba(255, 110, 132, 0.5));
 }
 
 .grid-bg {
@@ -243,82 +228,82 @@ body {
 }
 
 :root {
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.145 0 0);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.145 0 0);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.145 0 0);
-	--primary: oklch(0.205 0 0);
-	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.97 0 0);
-	--secondary-foreground: oklch(0.205 0 0);
-	--muted: oklch(0.97 0 0);
-	--muted-foreground: oklch(0.556 0 0);
-	--accent: oklch(0.97 0 0);
-	--accent-foreground: oklch(0.205 0 0);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.922 0 0);
-	--input: oklch(0.922 0 0);
-	--ring: oklch(0.708 0 0);
-	--chart-1: oklch(0.87 0 0);
-	--chart-2: oklch(0.556 0 0);
-	--chart-3: oklch(0.439 0 0);
-	--chart-4: oklch(0.371 0 0);
-	--chart-5: oklch(0.269 0 0);
+	--background: #0a0e19;
+	--foreground: #f8f8f2;
+	--card: #141927;
+	--card-foreground: #f8f8f2;
+	--popover: #141927;
+	--popover-foreground: #f8f8f2;
+	--primary: #bd93f9;
+	--primary-foreground: #0a0e19;
+	--secondary: #ff79c6;
+	--secondary-foreground: #0a0e19;
+	--muted: #202535;
+	--muted-foreground: #c7cbe0;
+	--accent: #8be9fd;
+	--accent-foreground: #0a0e19;
+	--destructive: #ff5555;
+	--border: #3a3f55;
+	--input: #2a2f43;
+	--ring: #bd93f9;
+	--chart-1: #bd93f9;
+	--chart-2: #ff79c6;
+	--chart-3: #50fa7b;
+	--chart-4: #8be9fd;
+	--chart-5: #ffb86c;
 	--radius: 0.625rem;
-	--sidebar: oklch(0.985 0 0);
-	--sidebar-foreground: oklch(0.145 0 0);
-	--sidebar-primary: oklch(0.205 0 0);
-	--sidebar-primary-foreground: oklch(0.985 0 0);
-	--sidebar-accent: oklch(0.97 0 0);
-	--sidebar-accent-foreground: oklch(0.205 0 0);
-	--sidebar-border: oklch(0.922 0 0);
-	--sidebar-ring: oklch(0.708 0 0);
+	--sidebar: #141927;
+	--sidebar-foreground: #f8f8f2;
+	--sidebar-primary: #bd93f9;
+	--sidebar-primary-foreground: #0a0e19;
+	--sidebar-accent: #202535;
+	--sidebar-accent-foreground: #f8f8f2;
+	--sidebar-border: #2a2f43;
+	--sidebar-ring: #bd93f9;
 }
 
 .dark {
-	--background: oklch(0.145 0 0);
-	--foreground: oklch(0.985 0 0);
-	--card: oklch(0.205 0 0);
-	--card-foreground: oklch(0.985 0 0);
-	--popover: oklch(0.205 0 0);
-	--popover-foreground: oklch(0.985 0 0);
-	--primary: oklch(0.922 0 0);
-	--primary-foreground: oklch(0.205 0 0);
-	--secondary: oklch(0.269 0 0);
-	--secondary-foreground: oklch(0.985 0 0);
-	--muted: oklch(0.269 0 0);
-	--muted-foreground: oklch(0.708 0 0);
-	--accent: oklch(0.269 0 0);
-	--accent-foreground: oklch(0.985 0 0);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
-	--ring: oklch(0.556 0 0);
-	--chart-1: oklch(0.87 0 0);
-	--chart-2: oklch(0.556 0 0);
-	--chart-3: oklch(0.439 0 0);
-	--chart-4: oklch(0.371 0 0);
-	--chart-5: oklch(0.269 0 0);
-	--sidebar: oklch(0.205 0 0);
-	--sidebar-foreground: oklch(0.985 0 0);
-	--sidebar-primary: oklch(0.488 0.243 264.376);
-	--sidebar-primary-foreground: oklch(0.985 0 0);
-	--sidebar-accent: oklch(0.269 0 0);
-	--sidebar-accent-foreground: oklch(0.985 0 0);
-	--sidebar-border: oklch(1 0 0 / 10%);
-	--sidebar-ring: oklch(0.556 0 0);
+	--background: #0a0e19;
+	--foreground: #f8f8f2;
+	--card: #141927;
+	--card-foreground: #f8f8f2;
+	--popover: #141927;
+	--popover-foreground: #f8f8f2;
+	--primary: #bd93f9;
+	--primary-foreground: #0a0e19;
+	--secondary: #ff79c6;
+	--secondary-foreground: #0a0e19;
+	--muted: #202535;
+	--muted-foreground: #c7cbe0;
+	--accent: #8be9fd;
+	--accent-foreground: #0a0e19;
+	--destructive: #ff5555;
+	--border: #3a3f55;
+	--input: #2a2f43;
+	--ring: #bd93f9;
+	--chart-1: #bd93f9;
+	--chart-2: #ff79c6;
+	--chart-3: #50fa7b;
+	--chart-4: #8be9fd;
+	--chart-5: #ffb86c;
+	--sidebar: #141927;
+	--sidebar-foreground: #f8f8f2;
+	--sidebar-primary: #bd93f9;
+	--sidebar-primary-foreground: #0a0e19;
+	--sidebar-accent: #202535;
+	--sidebar-accent-foreground: #f8f8f2;
+	--sidebar-border: #2a2f43;
+	--sidebar-ring: #bd93f9;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+	* {
+		@apply border-border outline-ring/50;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
 	}
-  html {
-    @apply font-sans;
+	html {
+		@apply font-sans;
 	}
 }

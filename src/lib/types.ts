@@ -51,6 +51,36 @@ export interface AnalysisResultEntry {
 	created_at: string;
 }
 
+export interface DashboardStats {
+	global_24h: number;
+	malicious: number;
+	suspicious: number;
+	safe: number;
+}
+
+export interface TrendDataPoint {
+	hour: string;
+	safe: number;
+	suspicious: number;
+	malicious: number;
+}
+
+export interface RecentAnalysis {
+	id: string;
+	original_name: string;
+	sender: string | null;
+	status: string;
+	submitted_at: string;
+	risk_level: string;
+	score: number;
+}
+
+export interface DashboardData {
+	stats: DashboardStats;
+	trend: TrendDataPoint[];
+	recent_analyses: RecentAnalysis[];
+}
+
 /** Pipeline stage timing record */
 export interface JobProgressEntry {
 	id: string;
