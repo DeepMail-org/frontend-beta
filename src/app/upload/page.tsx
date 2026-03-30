@@ -1,52 +1,67 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { uploadFile } from "@/lib/api";
+import { createProgressWebSocket, uploadFile } from "@/lib/api";
 import { PIPELINE_STAGES } from "@/lib/types";
 import type { PipelineStage, ProgressEvent } from "@/lib/types";
+import { FileUpload } from "@/components/ui/file-upload";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+
+const loadingStates = PIPELINE_STAGES.map((s) => ({ text: s.label }));
+
+const statusClassMap: Record<
+	PipelineStage["status"],
+	{ icon: string; badge: string }
+> = {
+	pending: {
+		icon: "text-outline-variant",
+		badge: "bg-outline-variant/10 border-outline-variant/30 text-outline-variant",
+	},
+	started: {
+		icon: "text-primary",
+		badge: "bg-primary/10 border-primary/30 text-primary",
+	},
+	completed: {
+		icon: "text-tertiary",
+		badge: "bg-tertiary/10 border-tertiary/30 text-tertiary",
+	},
+	failed: {
+		icon: "text-error",
+		badge: "bg-error/10 border-error/30 text-error",
+	},
+};
+
+const timelineColorClass: Record<
+	string,
+	{ dot: string; text: string; badge: string }
+> = {
+	tertiary: {
+		dot: "bg-tertiary",
+		text: "text-tertiary",
+		badge: "bg-tertiary/10 border-tertiary/30 text-tertiary",
+	},
+	primary: {
+		dot: "bg-primary",
+		text: "text-primary",
+		badge: "bg-primary/10 border-primary/30 text-primary",
+	},
+	error: {
+		dot: "bg-error",
+		text: "text-error",
+		badge: "bg-error/10 border-error/30 text-error",
+	},
+};
 
 export default function UploadPage() {
 	const router = useRouter();
-	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [file, setFile] = useState<File | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [error, setError] = useState<string | null>(null);
 	const [emailId, setEmailId] = useState<string | null>(null);
 	const [stages, setStages] = useState<PipelineStage[]>(
 		PIPELINE_STAGES.map((s) => ({ ...s, status: "pending" as const })),
-	);
-
-	const handleDragOver = useCallback((e: React.DragEvent) => {
-		e.preventDefault();
-		setIsDragging(true);
-	}, []);
-
-	const handleDragLeave = useCallback(() => {
-		setIsDragging(false);
-	}, []);
-
-	const handleDrop = useCallback((e: React.DragEvent) => {
-		e.preventDefault();
-		setIsDragging(false);
-		const droppedFile = e.dataTransfer.files[0];
-		if (droppedFile) {
-			setFile(droppedFile);
-			setError(null);
-		}
-	}, []);
-
-	const handleFileSelect = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const selectedFile = e.target.files?.[0];
-			if (selectedFile) {
-				setFile(selectedFile);
-				setError(null);
-			}
-		},
-		[],
 	);
 
 	const handleUpload = async () => {
@@ -82,11 +97,10 @@ export default function UploadPage() {
 	};
 
 	const connectWebSocket = (eid: string) => {
-		const wsBase =
-			process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001/api/v1";
 		try {
-			const ws = new WebSocket(`${wsBase}/ws/results/${eid}`);
-			ws.onmessage = (event) => {
+			const ws = createProgressWebSocket(
+				eid,
+				(event) => {
 				try {
 					const data: ProgressEvent = JSON.parse(event.data);
 					setStages((prev) =>
@@ -117,10 +131,16 @@ export default function UploadPage() {
 				} catch {
 					/* ignore parse errors */
 				}
-			};
-			ws.onerror = () => {
-				// Fallback: poll and redirect after delay
-				setTimeout(() => router.push(`/analysis/${eid}`), 5000);
+				},
+				() => {
+					setTimeout(() => router.push(`/analysis/${eid}`), 5000);
+				},
+			);
+
+			ws.onclose = () => {
+				if (isUploading) {
+					setTimeout(() => router.push(`/analysis/${eid}`), 5000);
+				}
 			};
 		} catch {
 			setTimeout(() => router.push(`/analysis/${eid}`), 5000);
@@ -133,18 +153,33 @@ export default function UploadPage() {
 		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	};
 
+	const activeStep = stages.findIndex(
+		(s) => s.status === "started" || s.status === "failed",
+	);
+	const currentLoadingState =
+		activeStep === -1
+			? stages.some((s) => s.status === "completed")
+				? stages.length - 1
+				: 0
+			: activeStep;
+
 	return (
 		<div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
+			<MultiStepLoader
+				loadingStates={loadingStates}
+				loading={isUploading || !!emailId}
+				currentState={currentLoadingState}
+			/>
 			{/* Header */}
 			<section className="flex flex-col md:flex-row justify-between items-end gap-6">
 				<div>
 					<div className="flex items-center gap-2 mb-2">
-						<span className="w-2 h-2 bg-secondary rounded-full animate-pulse shadow-[0_0_8px_#fd77c4]" />
+						<span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
 						<span className="text-[10px] uppercase tracking-[0.3em] text-secondary font-bold">
 							Threat Ingestion Protocol
 						</span>
 					</div>
-					<h2 className="text-4xl font-bold text-on-surface tracking-tight font-[family-name:var(--font-headline)]">
+					<h2 className="text-4xl font-bold text-on-surface tracking-tight font-headline">
 						Upload & Sandbox{" "}
 						<span className="text-primary">Panel</span>
 					</h2>
@@ -165,52 +200,25 @@ export default function UploadPage() {
 			</section>
 
 			{/* Main Grid */}
-			<div className="grid grid-cols-12 gap-6">
+			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 				{/* Upload Zone */}
-				<div className="col-span-12 bg-surface-variant/40 rounded-3xl border border-primary/20 p-8 flex flex-col gap-8 relative overflow-hidden group shadow-2xl backdrop-blur-md">
+				<div className="col-span-1 lg:col-span-5 bg-surface-variant/40 rounded-3xl border border-primary/20 p-8 flex flex-col gap-8 relative overflow-hidden group shadow-2xl backdrop-blur-md">
 					<div className="absolute inset-0 grid-bg pointer-events-none opacity-40" />
-					<div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+					<div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
 
 					{/* Drop Area */}
-					<div
-						onDragOver={handleDragOver}
-						onDragLeave={handleDragLeave}
-						onDrop={handleDrop}
-						onClick={() => fileInputRef.current?.click()}
-						className={`flex-1 relative border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-12 transition-all cursor-pointer overflow-hidden ${
-							isDragging
-								? "border-primary bg-primary/10"
-								: "border-outline-variant/30 bg-surface-container-lowest/80 hover:border-primary/40 hover:bg-surface-container/60"
-						}`}
-					>
-						<div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-						<div className="relative z-10 w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center text-primary mb-6 shadow-2xl border border-outline-variant/20">
-							<span className="material-symbols-outlined text-4xl glow-purple">
-								cloud_upload
-							</span>
+					{!file && (
+						<div className="relative z-10 w-full rounded-2xl border border-outline-variant/30 bg-surface-container-lowest/80 overflow-hidden shadow-xl">
+							<FileUpload
+								onChange={(files) => {
+									if (files.length > 0) {
+										setFile(files[0]);
+										setError(null);
+									}
+								}}
+							/>
 						</div>
-						<div className="relative z-10 text-center mb-8">
-							<h3 className="text-2xl font-bold text-on-surface font-[family-name:var(--font-headline)] tracking-tight">
-								{isDragging
-									? "Release to upload"
-									: "Drop file to detonate"}
-							</h3>
-							<p className="text-on-surface-variant text-xs mt-2 opacity-60">
-								Accepts .eml, .msg, .zip (password: infected),
-								or raw URL
-							</p>
-						</div>
-						<button className="relative z-10 px-10 py-3 bg-transparent border border-secondary/40 text-secondary rounded-lg font-black text-xs uppercase tracking-[0.2em] hover:bg-secondary/10 transition-all active:scale-95">
-							Browse Files
-						</button>
-						<input
-							ref={fileInputRef}
-							type="file"
-							className="hidden"
-							accept=".eml,.msg,.zip,.txt"
-							onChange={handleFileSelect}
-						/>
-					</div>
+					)}
 
 					{/* Selected File Card */}
 					{file && (
@@ -241,7 +249,7 @@ export default function UploadPage() {
 									{isUploading && (
 										<div className="relative w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
 											<div
-												className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_12px_rgba(189,147,249,0.5)] transition-all duration-300"
+												className="absolute inset-y-0 left-0 bg-linear-to-r from-primary to-secondary rounded-full transition-all duration-300"
 												style={{
 													width: `${uploadProgress}%`,
 												}}
@@ -265,7 +273,7 @@ export default function UploadPage() {
 							{!isUploading && (
 								<button
 									onClick={handleUpload}
-									className="w-full mt-4 py-3 gradient-primary text-on-primary rounded-xl shadow-[0_0_20px_rgba(196,154,255,0.3)] hover:scale-[1.01] transition-transform text-sm font-black uppercase tracking-wider"
+									className="w-full mt-4 py-3 gradient-primary text-on-primary rounded-xl hover:scale-[1.01] transition-transform text-sm font-black uppercase tracking-wider"
 								>
 									Detonate & Analyze
 								</button>
@@ -286,8 +294,8 @@ export default function UploadPage() {
 
 				{/* Execution Timeline */}
 				{emailId && (
-					<div className="col-span-12 bg-surface-container rounded-xl p-8 border border-outline-variant/10 shadow-2xl">
-						<h3 className="text-lg font-bold text-on-surface mb-8 flex items-center gap-2 font-[family-name:var(--font-headline)]">
+					<div className="col-span-1 lg:col-span-7 bg-surface-container rounded-xl p-8 border border-outline-variant/10 shadow-2xl">
+						<h3 className="text-lg font-bold text-on-surface mb-8 flex items-center gap-2 font-headline">
 							<span className="material-symbols-outlined text-tertiary">
 								monitor_heart
 							</span>
@@ -295,34 +303,28 @@ export default function UploadPage() {
 						</h3>
 						<div className="relative pl-8 border-l border-outline-variant/30 space-y-8">
 							{stages.map((stage) => {
-								const colorMap: Record<string, string> = {
-									pending: "outline-variant",
-									started: "primary",
-									completed: "tertiary",
-									failed: "error",
-								};
-								const color = colorMap[stage.status];
+								const statusClasses = statusClassMap[stage.status];
 								return (
 									<div key={stage.key} className="relative">
 										<div
 											className={`absolute -left-[41px] top-0 w-4 h-4 rounded-full border-4 border-surface transition-all duration-500 ${
 												stage.status === "completed"
-													? "bg-tertiary shadow-[0_0_10px_#b8ffbb]"
+													? "bg-tertiary"
 													: stage.status === "started"
-														? "bg-primary shadow-[0_0_10px_#c49aff] animate-pulse"
+														? "bg-primary animate-pulse"
 														: stage.status ===
 															  "failed"
-															? "bg-error shadow-[0_0_10px_#ff6e84]"
+															? "bg-error"
 															: "bg-outline-variant/50"
 											}`}
 										/>
 										<div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
 											<div className="flex items-center gap-3">
-												<span
-													className={`material-symbols-outlined text-${color} text-lg`}
-												>
-													{stage.icon}
-												</span>
+											<span
+												className={`material-symbols-outlined text-lg ${statusClasses.icon}`}
+											>
+												{stage.icon}
+											</span>
 												<div>
 													<h4 className="text-sm font-bold text-on-surface">
 														{stage.label}
@@ -334,11 +336,11 @@ export default function UploadPage() {
 													)}
 												</div>
 											</div>
-											<div
-												className={`px-3 py-1 bg-${color}/10 border border-${color}/30 text-${color} text-[10px] font-bold rounded uppercase`}
-											>
-												{stage.status}
-											</div>
+										<div
+											className={`px-3 py-1 text-[10px] font-bold rounded uppercase border ${statusClasses.badge}`}
+										>
+											{stage.status}
+										</div>
 										</div>
 									</div>
 								);
@@ -349,8 +351,8 @@ export default function UploadPage() {
 
 				{/* Demo Timeline (when no upload in progress) */}
 				{!emailId && !isUploading && (
-					<div className="col-span-12 bg-surface-container rounded-xl p-8 border border-outline-variant/10 shadow-2xl relative">
-						<h3 className="text-lg font-bold text-on-surface mb-8 flex items-center gap-2 font-[family-name:var(--font-headline)]">
+					<div className="col-span-1 lg:col-span-7 bg-surface-container rounded-xl p-8 border border-outline-variant/10 shadow-2xl relative">
+						<h3 className="text-lg font-bold text-on-surface mb-8 flex items-center gap-2 font-headline">
 							<span className="material-symbols-outlined text-tertiary">
 								monitor_heart
 							</span>
@@ -399,15 +401,18 @@ function TimelineItem({
 	desc: string;
 	badge: string;
 }) {
+	const classes =
+		timelineColorClass[color] || timelineColorClass.tertiary;
+
 	return (
 		<div className="relative">
 			<div
-				className={`absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-${color} border-4 border-surface shadow-[0_0_10px] shadow-${color}/50`}
+				className={`absolute -left-[41px] top-0 w-4 h-4 rounded-full border-4 border-surface ${classes.dot}`}
 			/>
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 				<div className="flex flex-col gap-1">
 					<span
-						className={`text-[10px] font-mono text-${color} tracking-tighter uppercase font-bold`}
+						className={`text-[10px] font-mono tracking-tighter uppercase font-bold ${classes.text}`}
 					>
 						{time}
 					</span>
@@ -417,7 +422,7 @@ function TimelineItem({
 					<p className="text-xs text-on-surface-variant">{desc}</p>
 				</div>
 				<div
-					className={`px-3 py-1 bg-${color}/10 border border-${color}/30 text-${color} text-[10px] font-bold rounded uppercase whitespace-nowrap`}
+					className={`px-3 py-1 border text-[10px] font-bold rounded uppercase whitespace-nowrap ${classes.badge}`}
 				>
 					{badge}
 				</div>

@@ -161,11 +161,11 @@ export default function TerminalPage() {
 		error: "text-error",
 	};
 
-	const levelBg: Record<string, string> = {
-		info: "text-primary/60",
-		ok: "text-tertiary/60",
-		warn: "text-dracula-orange/60",
-		error: "text-error/60",
+	const statColorClasses: Record<string, string> = {
+		primary: "text-primary",
+		tertiary: "text-tertiary",
+		"dracula-orange": "text-dracula-orange",
+		error: "text-error",
 	};
 
 	return (
@@ -308,13 +308,13 @@ export default function TerminalPage() {
 						className="glass-panel p-4 rounded-xl flex items-center gap-4"
 					>
 						<span
-							className={`material-symbols-outlined text-${stat.color} text-2xl`}
+							className={`material-symbols-outlined text-2xl ${statColorClasses[stat.color]}`}
 						>
 							{stat.icon}
 						</span>
 						<div>
 							<p
-								className={`text-xl font-bold font-[family-name:var(--font-headline)] text-${stat.color}`}
+								className={`text-xl font-bold font-[family-name:var(--font-headline)] ${statColorClasses[stat.color]}`}
 							>
 								{stat.value}
 							</p>

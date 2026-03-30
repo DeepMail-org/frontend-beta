@@ -6,7 +6,7 @@ import TopBar from "@/components/layout/TopBar";
 import StatusFooter from "@/components/layout/StatusFooter";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const spaceGrotesk = Space_Grotesk({
 	variable: "--font-headline",
@@ -31,7 +31,11 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" className={cn("dark", "font-sans", geist.variable)}>
+		<html
+			lang="en"
+			className={cn("dark", "font-sans", geist.variable)}
+			suppressHydrationWarning
+		>
 			<head>
 				<link
 					href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"

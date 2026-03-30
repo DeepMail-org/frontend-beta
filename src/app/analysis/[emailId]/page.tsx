@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { formatUtcDateTime, formatUtcTime } from "@/lib/format";
 
 // Demo data for the analysis detail view
 const DEMO_REPORT = {
@@ -139,8 +140,8 @@ export default function AnalysisDetailPage() {
 	const score = report.threat_score;
 
 	const getScoreColor = (s: number) => {
-		if (s >= 70) return "text-secondary";
-		if (s >= 40) return "text-primary-container";
+		if (s >= 70) return "text-dracula-red";
+		if (s >= 40) return "text-dracula-orange";
 		return "text-tertiary";
 	};
 
@@ -148,16 +149,16 @@ export default function AnalysisDetailPage() {
 		if (s >= 70)
 			return {
 				label: "MALICIOUS",
-				bg: "bg-secondary/10",
-				border: "border-secondary/20",
-				text: "text-secondary",
+				bg: "bg-dracula-red/10",
+				border: "border-dracula-red/20",
+				text: "text-dracula-red",
 			};
 		if (s >= 40)
 			return {
 				label: "SUSPICIOUS",
-				bg: "bg-primary-container/10",
-				border: "border-primary-container/20",
-				text: "text-primary-container",
+				bg: "bg-dracula-orange/10",
+				border: "border-dracula-orange/20",
+				text: "text-dracula-orange",
 			};
 		return {
 			label: "SECURE",
@@ -217,9 +218,7 @@ export default function AnalysisDetailPage() {
 									{badge.label}
 								</span>
 								<span className="text-[10px] text-outline">
-									{new Date(
-										report.email.submitted_at,
-									).toLocaleString()}
+									{formatUtcDateTime(report.email.submitted_at)}
 								</span>
 								<span className="text-[10px] text-outline">
 									{(report.email.file_size / 1024).toFixed(1)}{" "}
@@ -398,7 +397,7 @@ export default function AnalysisDetailPage() {
 				<div className="col-span-12 lg:col-span-6">
 					<div className="glass-panel rounded-xl p-6 h-full">
 						<h3 className="text-sm font-bold tracking-widest uppercase mb-6 flex items-center gap-2 font-[family-name:var(--font-headline)]">
-							<span className="material-symbols-outlined text-secondary text-lg">
+							<span className="material-symbols-outlined text-dracula-red text-lg">
 								phishing
 							</span>
 							Phishing Indicators
@@ -409,8 +408,8 @@ export default function AnalysisDetailPage() {
 									key={i}
 									className="flex items-center gap-4 p-3 bg-surface-container-low/50 rounded-lg"
 								>
-									<div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center border border-secondary/20">
-										<span className="text-sm font-bold text-secondary">
+									<div className="w-10 h-10 rounded-lg bg-dracula-red/10 flex items-center justify-center border border-dracula-red/20">
+										<span className="text-sm font-bold text-dracula-red">
 											{Math.round(kw.score * 100)}%
 										</span>
 									</div>
@@ -424,7 +423,7 @@ export default function AnalysisDetailPage() {
 									</div>
 									<div className="w-20 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
 										<div
-											className="h-full bg-secondary rounded-full"
+											className="h-full bg-dracula-red rounded-full"
 											style={{
 												width: `${kw.score * 100}%`,
 											}}
@@ -445,7 +444,7 @@ export default function AnalysisDetailPage() {
 									className={`p-3 rounded-lg flex items-start gap-3 ${u.risk === "critical" ? "bg-error/5 border border-error/20" : "bg-surface-container-low/50"}`}
 								>
 									<span
-										className={`material-symbols-outlined text-sm ${u.risk === "critical" ? "text-error" : "text-primary-container"}`}
+									className={`material-symbols-outlined text-sm ${u.risk === "critical" ? "text-error" : "text-dracula-orange"}`}
 									>
 										{u.risk === "critical"
 											? "warning"
@@ -457,7 +456,7 @@ export default function AnalysisDetailPage() {
 										</p>
 										<div className="flex items-center gap-3 mt-1">
 											<span
-												className={`text-[10px] font-bold uppercase ${u.risk === "critical" ? "text-error" : "text-primary-container"}`}
+											className={`text-[10px] font-bold uppercase ${u.risk === "critical" ? "text-error" : "text-dracula-orange"}`}
 											>
 												{u.status}
 											</span>
@@ -536,9 +535,7 @@ export default function AnalysisDetailPage() {
 												{ioc.value}
 											</td>
 											<td className="px-6 py-3 text-[10px] text-outline">
-												{new Date(
-													ioc.first_seen,
-												).toLocaleTimeString()}
+												{formatUtcTime(ioc.first_seen)}
 											</td>
 											<td className="px-6 py-3">
 												<button className="material-symbols-outlined text-outline hover:text-on-surface text-lg">
@@ -629,10 +626,10 @@ export default function AnalysisDetailPage() {
 										GeoIP Map
 									</span>
 								</Link>
-								<button className="p-4 bg-surface-container-high rounded-lg border border-outline-variant/10 hover:border-secondary/30 transition-all flex flex-col items-center gap-2 text-center">
-									<span className="material-symbols-outlined text-secondary text-2xl">
-										download
-									</span>
+							<button className="p-4 bg-surface-container-high rounded-lg border border-outline-variant/10 hover:border-dracula-red/30 transition-all flex flex-col items-center gap-2 text-center">
+								<span className="material-symbols-outlined text-dracula-red text-2xl">
+									download
+								</span>
 									<span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
 										Export PDF
 									</span>
@@ -680,7 +677,7 @@ function HeaderRow({
 				{label}:
 			</span>
 			<span
-				className={`text-xs font-mono ${danger ? "text-secondary" : "text-on-surface-variant"}`}
+				className={`text-xs font-mono ${danger ? "text-dracula-red" : "text-on-surface-variant"}`}
 			>
 				{value}
 			</span>
