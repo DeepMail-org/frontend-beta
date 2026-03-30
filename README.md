@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeepMail Frontend
 
-## Getting Started
+## Purpose
 
-First, run the development server:
+Next.js 16 frontend for the DeepMail email threat intelligence platform. Provides
+a web interface for uploading email files, viewing analysis results, and managing
+authentication tokens.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Architecture
+
+```
+┌─────────────────────────┐
+│   Next.js 16 App Router  │
+│   (Server + Client)      │
+└────────────┬────────────┘
+             │
+    ┌────────┴────────┐
+    │  Components    │
+    ├────────────────┤
+    │ layout/        │ - TopBar, navigation
+    │ ui/            │ - Reusable UI components
+    │ analysis/      │ - Analysis display components
+    │ dashboard/     │ - Dashboard widgets
+    │ upload/        │ - File upload components
+    └────────┬────────┘
+             │
+    ┌────────┴────────┐
+    │  lib/           │
+    │  api.ts         │ - API client, error handling
+    │  types.ts       │ - TypeScript definitions
+    │  format.ts      │ - Formatting utilities
+    └─────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Path | Description |
+|------|-------------|
+| `/` | Dashboard with threat overview |
+| `/upload` | Email file upload interface |
+| `/analysis` | List of analyzed emails |
+| `/analysis/[emailId]` | Detailed analysis of a specific email |
+| `/analysis/[emailId]/map` | Geolocation map visualization |
+| `/analysis/[emailId]/terminal` | Terminal-style IOC display |
+| `/reports` | Threat reports |
+| `/sandbox` | Sandbox execution results |
+| `/settings` | Token management and settings |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Authentication
 
-## Learn More
+The frontend supports JWT token-based authentication:
 
-To learn more about Next.js, take a look at the following resources:
+- **Token Entry**: Users enter JWT token in Settings page (`/settings`)
+- **Token Storage**: Tokens stored in localStorage via `setToken()` / `getToken()`
+- **Token Status**: TopBar shows connection status (connected/disconnected)
+- **Error Handling**: 401 responses trigger redirect to settings
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### API Client (`lib/api.ts`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `ApiError` class: Custom error with status code, message, and details
+- `getToken()`: Retrieve token from localStorage
+- `setToken(token)`: Store token in localStorage  
+- `clearToken()`: Remove token from localStorage
+- All API calls include token in `Authorization: Bearer <token>` header
 
-## Deploy on Vercel
+## Color System (Dracula Theme)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The UI uses a Dracula-inspired color palette for threat levels:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Level | Color | Hex | Usage |
+|-------|-------|-----|-------|
+| Critical | Red | `#ff5555` | High-severity threats, errors |
+| Suspicious | Orange | `#ffb86c` | Medium-severity, warnings |
+| Safe | Green | `#50fa7b` | Low/clean results |
+| Neutral | Gray | `#6272a4` | Unknown, informational |
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **Language**: TypeScript
+- **Styling**: CSS Modules + global CSS (Dracula theme)
+- **Package Manager**: Bun
+
+## Development
+
+```bash
+# Install dependencies
+bun install
+
+# Run development server
+bun run dev
+
+# Run lint
+bun run lint
+
+# Build for production
+bun run build
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | Backend API URL (default: http://localhost:8000) |
