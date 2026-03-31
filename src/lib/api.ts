@@ -24,7 +24,8 @@ function resolveApiBase(): string {
 	}
 
 	if (typeof window !== "undefined") {
-		const protocol = window.location.protocol === "https:" ? "https" : "http";
+		const protocol =
+			window.location.protocol === "https:" ? "https" : "http";
 		return `${protocol}://${window.location.hostname}:3001/api/v1`;
 	}
 
@@ -57,10 +58,14 @@ export function getStoredToken(): string | null {
 /** Set JWT token */
 export function setToken(token: string): void {
 	localStorage.setItem("deepmail_token", token);
+	// Trigger storage event manually for same-window reactivity
+	window.dispatchEvent(new Event("storage_local_update"));
 }
 
 export function clearToken(): void {
 	localStorage.removeItem("deepmail_token");
+	// Trigger storage event manually for same-window reactivity
+	window.dispatchEvent(new Event("storage_local_update"));
 }
 
 /** Build headers with auth */
@@ -71,6 +76,20 @@ function authHeaders(extra?: Record<string, string>): HeadersInit {
 	const token = getToken();
 	if (token) {
 		headers["Authorization"] = `Bearer ${token}`;
+
+		// Extract fingerprint from JWT cnf claim (required by backend)
+		try {
+			const payload = token.split(".")[1];
+			// Support both browser atob and standard base64 decoding
+			const decoded = JSON.parse(
+				atob(payload.replace(/-/g, "+").replace(/_/g, "/")),
+			);
+			if (decoded.cnf) {
+				headers["x-device-fingerprint"] = decoded.cnf;
+			}
+		} catch (error) {
+			console.warn("Failed to extract fingerprint from JWT token", error);
+		}
 	}
 	return headers;
 }

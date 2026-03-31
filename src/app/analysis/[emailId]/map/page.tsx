@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getResults } from "@/lib/api";
-import { stableRotationFromId } from "@/lib/format";
-import { EmailAnalysisReport } from "@/lib/types";
+import { EmailAnalysisReport, GeoPoint } from "@/lib/types";
+import ThreatGlobe from "@/components/dashboard/ThreatGlobe";
 
 type IocMetadata = {
 	lat?: number;
@@ -123,7 +123,6 @@ export default function MapPage() {
 			lon,
 			country,
 			risk,
-			rotation: stableRotationFromId(ioc.id, 30),
 		};
 	});
 
@@ -212,104 +211,13 @@ export default function MapPage() {
 				{/* Globe Visualization */}
 				<div className="col-span-12 lg:col-span-8">
 					<div
-						className="glass-panel rounded-xl p-8 relative overflow-hidden"
+						className="glass-panel rounded-xl p-8 relative flex items-center justify-center overflow-hidden"
 						style={{ minHeight: "500px" }}
 					>
-						{/* CSS 3D Globe */}
-						<div className="absolute inset-0 flex items-center justify-center">
-							<div className="relative w-[400px] h-[400px]">
-								{/* Globe circle */}
-								<div
-									className="absolute inset-0 rounded-full border border-primary/20"
-									style={{
-										background:
-											"radial-gradient(circle at 35% 35%, rgba(196,154,255,0.12), rgba(10,14,25,0.9))",
-										boxShadow:
-											"0 0 80px rgba(196,154,255,0.08), inset 0 0 60px rgba(0,0,0,0.5)",
-									}}
-								/>
-								{/* Grid lines */}
-								{[0, 30, 60, 90, 120, 150].map((deg) => (
-									<div
-										key={`h-${deg}`}
-										className="absolute inset-0 rounded-full border border-primary/5"
-										style={{
-											transform: `rotateX(${deg}deg)`,
-										}}
-									/>
-								))}
-								{[0, 30, 60, 90, 120, 150].map((deg) => (
-									<div
-										key={`v-${deg}`}
-										className="absolute inset-0 rounded-full border border-primary/5"
-										style={{
-											transform: `rotateY(${deg}deg)`,
-										}}
-									/>
-								))}
-
-								{/* IOC Markers */}
-								{mappedLocations.map((ioc) => {
-									const x = 50 + (ioc.lon / 180) * 40;
-									const y = 50 - (ioc.lat / 90) * 40;
-									const colorMap: Record<string, string> = {
-										critical: "#ff6e84",
-										high: "#bd93f9",
-										medium: "#c49aff",
-										low: "#50fa7b",
-									};
-									const color = colorMap[ioc.risk];
-									return (
-										<div
-											key={ioc.id}
-											className="absolute z-10 group/marker cursor-pointer"
-											style={{
-												left: `${x}%`,
-												top: `${y}%`,
-												transform:
-													"translate(-50%, -50%)",
-											}}
-										>
-											<div
-												className="w-3 h-3 rounded-full animate-pulse"
-												style={{
-													backgroundColor: color,
-													boxShadow: `0 0 12px ${color}, 0 0 24px ${color}40`,
-												}}
-											/>
-											{/* Connection lines */}
-											<div
-												className="absolute top-1/2 left-1/2 w-24 h-px opacity-30"
-												style={{
-													background: `linear-gradient(to right, ${color}, transparent)`,
-													transform: `rotate(${ioc.rotation}deg)`,
-												}}
-											/>
-											{/* Tooltip */}
-											<div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/marker:opacity-100 transition-opacity pointer-events-none">
-												<div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-3 py-2 text-[10px] whitespace-nowrap shadow-xl">
-													<p className="font-bold text-on-surface">
-														{ioc.value}
-													</p>
-													<p className="text-outline">
-														{ioc.country} •{" "}
-														{ioc.type.toUpperCase()}
-													</p>
-												</div>
-											</div>
-										</div>
-									);
-								})}
-
-								{mappedLocations.length === 0 && (
-									<div className="absolute inset-0 flex items-center justify-center">
-										<p className="text-outline/50 font-bold tracking-widest uppercase text-xs">
-											No IOCs Extracted
-										</p>
-									</div>
-								)}
-							</div>
-						</div>
+						<ThreatGlobe
+							geoPoints={mappedLocations as GeoPoint[]}
+							size={500}
+						/>
 						{/* Floating label */}
 						<div className="absolute top-6 left-6">
 							<p className="text-[10px] uppercase tracking-widest text-outline font-bold">
@@ -334,7 +242,9 @@ export default function MapPage() {
 								</p>
 							) : (
 								mappedLocations.map((ioc) => {
-									const classes = riskClassMap[ioc.risk] || riskClassMap.low;
+									const classes =
+										riskClassMap[ioc.risk] ||
+										riskClassMap.low;
 									return (
 										<div
 											key={ioc.id}
@@ -342,12 +252,12 @@ export default function MapPage() {
 										>
 											<div className="flex items-start justify-between mb-2">
 												<div className="flex items-center gap-2">
-												<div
-													className={`w-2 h-2 rounded-full ${classes.dot}`}
-												/>
-												<span
-													className={`text-[10px] font-bold uppercase ${classes.text}`}
-												>
+													<div
+														className={`w-2 h-2 rounded-full ${classes.dot}`}
+													/>
+													<span
+														className={`text-[10px] font-bold uppercase ${classes.text}`}
+													>
 														{ioc.risk}
 													</span>
 												</div>

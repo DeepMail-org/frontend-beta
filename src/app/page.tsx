@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { ApiError, getDashboard } from "@/lib/api";
-import { DashboardData, RecentAnalysis, TrendDataPoint } from "@/lib/types";
+import {
+	DashboardData,
+	RecentAnalysis,
+	TrendDataPoint,
+	GeoPoint,
+} from "@/lib/types";
 import { formatUtcTime } from "@/lib/format";
+import ThreatGraph from "@/components/dashboard/ThreatGraph";
+import Link from "next/link";
 
 const DEMO_RECENT_ANALYSES: RecentAnalysis[] = [
 	{
@@ -69,12 +76,17 @@ export default function DashboardPage() {
 				setData(res);
 				setError(null);
 				consecutiveFailures = 0;
+
+				// Ensure polling is active if we have data
+				if (!intervalId && !cancelled) {
+					intervalId = setInterval(fetchData, 5000);
+				}
 			} catch (err) {
 				console.error("Dashboard fetch error:", err);
 				if (cancelled) return;
 				if (err instanceof ApiError && err.status === 401) {
 					setError(
-						"Authentication required. Add your JWT token in Settings → API Keys and refresh.",
+						"Authentication required. Add your JWT token in Settings → API Keys.",
 					);
 					if (intervalId) {
 						clearInterval(intervalId);
@@ -96,11 +108,22 @@ export default function DashboardPage() {
 		fetchData();
 		intervalId = setInterval(fetchData, 5000);
 
+		// Listen for token changes to resume polling if it was stopped
+		const onTokenChange = () => {
+			if (!intervalId && !cancelled) {
+				fetchData();
+			}
+		};
+		window.addEventListener("storage", onTokenChange);
+		window.addEventListener("storage_local_update", onTokenChange);
+
 		return () => {
 			cancelled = true;
 			if (intervalId) {
 				clearInterval(intervalId);
 			}
+			window.removeEventListener("storage", onTokenChange);
+			window.removeEventListener("storage_local_update", onTokenChange);
 		};
 	}, []);
 
@@ -113,6 +136,7 @@ export default function DashboardPage() {
 	};
 	let trend = data?.trend && data.trend.length > 0 ? data.trend : [];
 	let recentAnalyses = data?.recent_analyses || [];
+	let geoPoints = data?.geo_points || [];
 
 	// Fallback to rich dummy data for demonstration if backend is empty
 	const showDemoData = !data && !error;
@@ -136,6 +160,48 @@ export default function DashboardPage() {
 			{ hour: "18", safe: 140, suspicious: 30, malicious: 6 },
 			{ hour: "20", safe: 100, suspicious: 20, malicious: 4 },
 			{ hour: "22", safe: 80, suspicious: 15, malicious: 3 },
+		];
+		geoPoints = [
+			{
+				id: "g1",
+				lat: 40.7128,
+				lon: -74.006,
+				country: "USA",
+				risk: "Critical",
+				value: "192.168.1.1",
+			},
+			{
+				id: "g2",
+				lat: 51.5074,
+				lon: -0.1278,
+				country: "UK",
+				risk: "Suspicious",
+				value: "10.0.0.1",
+			},
+			{
+				id: "g3",
+				lat: 35.6762,
+				lon: 139.6503,
+				country: "Japan",
+				risk: "Safe",
+				value: "172.16.0.1",
+			},
+			{
+				id: "g4",
+				lat: -33.8688,
+				lon: 151.2093,
+				country: "Australia",
+				risk: "Suspicious",
+				value: "8.8.8.8",
+			},
+			{
+				id: "g5",
+				lat: 28.6139,
+				lon: 77.209,
+				country: "India",
+				risk: "Critical",
+				value: "45.123.11.1",
+			},
 		];
 		recentAnalyses = DEMO_RECENT_ANALYSES;
 	}
@@ -192,12 +258,8 @@ export default function DashboardPage() {
 
 	const cleanAreaPath = generateAreaPath((t) => t.safe);
 	const cleanLinePath = generateLinePath((t) => t.safe);
-	const threatAreaPath = generateAreaPath(
-		(t) => t.malicious + t.suspicious,
-	);
-	const threatLinePath = generateLinePath(
-		(t) => t.malicious + t.suspicious,
-	);
+	const threatAreaPath = generateAreaPath((t) => t.malicious + t.suspicious);
+	const threatLinePath = generateLinePath((t) => t.malicious + t.suspicious);
 
 	return (
 		<div className="p-8 lg:p-12 space-y-12">
@@ -500,17 +562,18 @@ export default function DashboardPage() {
 												if (
 													ra.risk_level === "Critical"
 												) {
-												dotColor = "bg-dracula-red";
-												badgeColor =
-													"text-dracula-red bg-dracula-red/10 border-dracula-red/20";
-											} else if (
-												ra.risk_level ===
-												"Suspicious"
-											) {
-												dotColor = "bg-dracula-orange";
-												badgeColor =
-													"text-dracula-orange bg-dracula-orange/10 border-dracula-orange/20";
-											}
+													dotColor = "bg-dracula-red";
+													badgeColor =
+														"text-dracula-red bg-dracula-red/10 border-dracula-red/20";
+												} else if (
+													ra.risk_level ===
+													"Suspicious"
+												) {
+													dotColor =
+														"bg-dracula-orange";
+													badgeColor =
+														"text-dracula-orange bg-dracula-orange/10 border-dracula-orange/20";
+												}
 
 												return (
 													<tr
@@ -551,7 +614,9 @@ export default function DashboardPage() {
 															</div>
 														</td>
 														<td className="px-8 py-4 text-outline font-mono text-xs">
-															{formatUtcTime(ra.submitted_at)}
+															{formatUtcTime(
+																ra.submitted_at,
+															)}
 														</td>
 														<td className="px-8 py-4">
 															<span
@@ -633,15 +698,15 @@ export default function DashboardPage() {
 									color = "suspicious";
 								}
 								return (
-															<FeedItem
-																key={ra.id}
-																icon={icon}
-																color={color}
-																label={`${ra.risk_level} DETECTED`}
-																time={formatUtcTime(ra.submitted_at)}
-																title={ra.original_name}
-																desc={`Action taken based on threat score of ${ra.score.toFixed(0)}/100`}
-															/>
+									<FeedItem
+										key={ra.id}
+										icon={icon}
+										color={color}
+										label={`${ra.risk_level} DETECTED`}
+										time={formatUtcTime(ra.submitted_at)}
+										title={ra.original_name}
+										desc={`Action taken based on threat score of ${ra.score.toFixed(0)}/100`}
+									/>
 								);
 							})}
 
@@ -651,26 +716,28 @@ export default function DashboardPage() {
 								</p>
 							)}
 
-							{/* Network Graph Mini */}
+							{/* Real-Time Geolocation Graph (Obsidian Style) */}
 							<div className="pt-4 mt-4 border-t border-outline-variant/10">
-								<div className="bg-surface-container-lowest rounded-xl p-4 relative overflow-hidden">
-									<div className="flex items-center justify-between mb-4">
-										<p className="text-[9px] font-bold uppercase tracking-widest text-outline">
-											IOC Graph
-										</p>
-										<span className="material-symbols-outlined text-xs text-outline">
-											hub
+								<div className="flex items-center justify-between mb-4">
+									<h3 className="text-[10px] font-black tracking-widest uppercase text-white/30">
+										Threat Nexus
+									</h3>
+									<Link
+										href="/graph"
+										className="text-[9px] font-black tracking-widest uppercase text-primary hover:text-white transition-colors flex items-center gap-1 group"
+									>
+										Expand Graph
+										<span className="material-symbols-outlined text-[10px] transform group-hover:translate-x-0.5 transition-transform">
+											arrow_forward
 										</span>
-									</div>
-									<div className="flex justify-around items-center h-24 relative">
-										<div className="w-3 h-3 rounded-full bg-secondary z-10" />
-										<div className="w-2 h-2 rounded-full bg-primary/40 z-10" />
-										<div className="w-4 h-4 rounded-full bg-tertiary z-10" />
-										<div className="w-2 h-2 rounded-full bg-primary-container z-10" />
-										<div className="absolute inset-0 flex items-center">
-											<div className="w-full h-px bg-linear-to-r from-secondary/20 via-primary/20 to-tertiary/20" />
-										</div>
-									</div>
+									</Link>
+								</div>
+								<div className="h-[300px] w-full">
+									<ThreatGraph
+										geoPoints={geoPoints}
+										width={300}
+										height={300}
+									/>
 								</div>
 							</div>
 						</div>
@@ -725,15 +792,19 @@ function FeedItem({
 				<div
 					className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 ${classes.bubble}`}
 				>
-					<span className={`material-symbols-outlined text-sm ${classes.icon}`}>
+					<span
+						className={`material-symbols-outlined text-sm ${classes.icon}`}
+					>
 						{icon}
 					</span>
 				</div>
 				<div className="w-px h-full bg-outline-variant/20 mt-2" />
 			</div>
-			<div className="flex-grow pb-6">
+			<div className="grow pb-6">
 				<div className="flex justify-between mb-1">
-					<span className={`text-[10px] font-bold uppercase tracking-widest ${classes.label}`}>
+					<span
+						className={`text-[10px] font-bold uppercase tracking-widest ${classes.label}`}
+					>
 						{label}
 					</span>
 					<span className="text-[10px] text-outline">{time}</span>

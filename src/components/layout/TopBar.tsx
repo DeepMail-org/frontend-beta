@@ -1,9 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { getStoredToken } from "@/lib/api";
 
 export default function TopBar() {
-	const hasToken = Boolean(getStoredToken());
+	const [hasToken, setHasToken] = useState(false);
+
+	useEffect(() => {
+		const checkToken = () => setHasToken(Boolean(getStoredToken()));
+		checkToken();
+
+		// Listen for storage changes (other tabs)
+		window.addEventListener("storage", checkToken);
+		// Listen for manual updates (same tab)
+		window.addEventListener("storage_local_update", checkToken);
+
+		return () => {
+			window.removeEventListener("storage", checkToken);
+			window.removeEventListener("storage_local_update", checkToken);
+		};
+	}, []);
 
 	return (
 		<header className="sticky top-0 z-40 bg-bg/80 backdrop-blur-xl shadow-[0_4px_20px_rgba(196,154,255,0.08)] flex justify-between items-center w-full px-8 py-4">
@@ -21,7 +37,7 @@ export default function TopBar() {
 					<span
 						className={`text-[10px] font-bold uppercase tracking-widest ${hasToken ? "text-tertiary" : "text-dracula-red"}`}
 					>
-						{hasToken ? "Token Loaded" : "Auth Required"}
+						{hasToken ? "Connected" : "Disconnected"}
 					</span>
 				</div>
 				{/* System Status */}

@@ -51,6 +51,15 @@ export interface AnalysisResultEntry {
 	created_at: string;
 }
 
+export interface GeoPoint {
+	id: string;
+	lat: number;
+	lon: number;
+	country: string;
+	risk: "Safe" | "Suspicious" | "Critical";
+	value: string;
+}
+
 export interface DashboardStats {
 	global_24h: number;
 	malicious: number;
@@ -79,6 +88,7 @@ export interface DashboardData {
 	stats: DashboardStats;
 	trend: TrendDataPoint[];
 	recent_analyses: RecentAnalysis[];
+	geo_points: GeoPoint[];
 }
 
 /** Pipeline stage timing record */
