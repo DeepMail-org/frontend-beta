@@ -9,6 +9,7 @@ import type { EmailAnalysisReport, GeoMapPoint, HopTimelinePoint } from "@/lib/t
 import WorldMap from "@/components/map/WorldMap";
 import IpSidebar from "@/components/map/IpSidebar";
 import HopTimeline from "@/components/map/HopTimeline";
+import { parseEmailAnalysisReportContract } from "@/lib/contracts/results";
 
 export default function MapPage() {
 	const params = useParams();
@@ -29,7 +30,8 @@ export default function MapPage() {
 		setActiveHop(0);
 
 		try {
-			const data = await getResults(emailId);
+			const rawData = await getResults(emailId);
+			const data = parseEmailAnalysisReportContract(rawData) as EmailAnalysisReport;
 			setReport(data);
 			setPoints(data.geo_points ?? []);
 			setHops(data.hop_timeline ?? []);

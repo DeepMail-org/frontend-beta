@@ -119,7 +119,16 @@ bun run build
 
 # Run E2E tests
 bun run test:e2e
+
+# Run backend contract schema tests
+bun run test:contract
 ```
+
+## Contract Safety
+
+- `src/lib/contracts/results.ts` contains runtime payload validation for `/results/:email_id`
+- Map page parses report payload through contract schema before rendering
+- Contract tests live in `tests/contract/results.contract.test.ts`
 
 ## Environment Variables
 

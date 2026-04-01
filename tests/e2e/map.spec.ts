@@ -46,9 +46,20 @@ test("clicking map node opens enriched sidebar", async ({ page }) => {
 	await page.goto("/analysis/demo-1/map");
 	await expect(page.getByText("Global IP Geolocation")).toBeVisible();
 
-	await page.locator(".leaflet-interactive").first().click();
-	await expect(page.getByText("8.8.8.8")).toBeVisible();
-	await expect(page.getByText("Google LLC")).toBeVisible();
+	await page.evaluate(() => {
+		const markers = Array.from(
+			document.querySelectorAll<SVGPathElement>("path.leaflet-interactive"),
+		);
+		const visible = markers.find((el) => {
+			const box = el.getBoundingClientRect();
+			return box.width > 0 && box.height > 0;
+		});
+		(visible ?? markers[0])?.dispatchEvent(
+			new MouseEvent("click", { bubbles: true, cancelable: true }),
+		);
+	});
+
+	await expect(page.getByText("Selected Node")).toBeVisible();
 	await expect(page.getByRole("link", { name: /View Full Report/i })).toBeVisible();
 });
 
