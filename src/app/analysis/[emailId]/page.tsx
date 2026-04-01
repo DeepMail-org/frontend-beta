@@ -205,7 +205,7 @@ export default function AnalysisDetailPage() {
 							</span>
 						</div>
 						<div>
-							<h2 className="text-2xl font-bold text-on-surface tracking-tight font-[family-name:var(--font-headline)]">
+							<h2 className="text-2xl font-bold text-on-surface tracking-tight font-headline">
 								{report.email.original_name}
 							</h2>
 							<p className="text-xs text-outline font-mono mt-1 break-all">
@@ -218,7 +218,9 @@ export default function AnalysisDetailPage() {
 									{badge.label}
 								</span>
 								<span className="text-[10px] text-outline">
-									{formatUtcDateTime(report.email.submitted_at)}
+									{formatUtcDateTime(
+										report.email.submitted_at,
+									)}
 								</span>
 								<span className="text-[10px] text-outline">
 									{(report.email.file_size / 1024).toFixed(1)}{" "}
@@ -264,7 +266,7 @@ export default function AnalysisDetailPage() {
 								</svg>
 								<div className="absolute inset-0 flex flex-col items-center justify-center">
 									<span
-										className={`text-3xl font-bold font-[family-name:var(--font-headline)] ${getScoreColor(score.total)}`}
+										className={`text-3xl font-bold font-headline ${getScoreColor(score.total)}`}
 									>
 										{score.total}
 									</span>
@@ -319,7 +321,7 @@ export default function AnalysisDetailPage() {
 				{/* Header Analysis */}
 				<div className="col-span-12 lg:col-span-6">
 					<div className="glass-panel rounded-xl p-6 h-full">
-						<h3 className="text-sm font-bold tracking-widest uppercase mb-6 flex items-center gap-2 font-[family-name:var(--font-headline)]">
+						<h3 className="text-sm font-bold tracking-widest uppercase mb-6 flex items-center gap-2 font-headline">
 							<span className="material-symbols-outlined text-primary text-lg">
 								policy
 							</span>
@@ -396,7 +398,7 @@ export default function AnalysisDetailPage() {
 				{/* Phishing Keywords */}
 				<div className="col-span-12 lg:col-span-6">
 					<div className="glass-panel rounded-xl p-6 h-full">
-						<h3 className="text-sm font-bold tracking-widest uppercase mb-6 flex items-center gap-2 font-[family-name:var(--font-headline)]">
+						<h3 className="text-sm font-bold tracking-widest uppercase mb-6 flex items-center gap-2 font-headline">
 							<span className="material-symbols-outlined text-dracula-red text-lg">
 								phishing
 							</span>
@@ -444,7 +446,7 @@ export default function AnalysisDetailPage() {
 									className={`p-3 rounded-lg flex items-start gap-3 ${u.risk === "critical" ? "bg-error/5 border border-error/20" : "bg-surface-container-low/50"}`}
 								>
 									<span
-									className={`material-symbols-outlined text-sm ${u.risk === "critical" ? "text-error" : "text-dracula-orange"}`}
+										className={`material-symbols-outlined text-sm ${u.risk === "critical" ? "text-error" : "text-dracula-orange"}`}
 									>
 										{u.risk === "critical"
 											? "warning"
@@ -456,7 +458,7 @@ export default function AnalysisDetailPage() {
 										</p>
 										<div className="flex items-center gap-3 mt-1">
 											<span
-											className={`text-[10px] font-bold uppercase ${u.risk === "critical" ? "text-error" : "text-dracula-orange"}`}
+												className={`text-[10px] font-bold uppercase ${u.risk === "critical" ? "text-error" : "text-dracula-orange"}`}
 											>
 												{u.status}
 											</span>
@@ -477,7 +479,7 @@ export default function AnalysisDetailPage() {
 				<div className="col-span-12">
 					<div className="glass-panel rounded-xl overflow-hidden">
 						<div className="px-6 py-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/50">
-							<h3 className="text-sm font-bold tracking-widest uppercase flex items-center gap-2 font-[family-name:var(--font-headline)]">
+							<h3 className="text-sm font-bold tracking-widest uppercase flex items-center gap-2 font-headline">
 								<span className="material-symbols-outlined text-primary text-lg">
 									search
 								</span>
@@ -485,13 +487,13 @@ export default function AnalysisDetailPage() {
 							</h3>
 							<div className="flex gap-2">
 								<Link
-									href={`/analysis/${emailId}/map`}
-									className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1"
+									href={`/analysis/${emailId}/graph`}
+									className="text-[10px] font-bold text-tertiary hover:underline flex items-center gap-1"
 								>
 									<span className="material-symbols-outlined text-xs">
-										public
+										hub
 									</span>
-									GEO_MAP
+									GRAPH_VIEW
 								</Link>
 							</div>
 						</div>
@@ -537,10 +539,30 @@ export default function AnalysisDetailPage() {
 											<td className="px-6 py-3 text-[10px] text-outline">
 												{formatUtcTime(ioc.first_seen)}
 											</td>
-											<td className="px-6 py-3">
+											<td className="px-6 py-3 relative group/action">
 												<button className="material-symbols-outlined text-outline hover:text-on-surface text-lg">
 													more_vert
 												</button>
+												<div className="absolute right-6 top-full mt-1 w-40 bg-surface-container-high border border-white/10 rounded-lg shadow-2xl opacity-0 invisible group-hover/action:opacity-100 group-hover/action:visible transition-all z-20 flex flex-col overflow-hidden">
+													<button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-left hover:bg-primary/10 hover:text-primary flex items-center gap-2 transition-colors">
+														<span className="material-symbols-outlined text-sm">
+															search
+														</span>
+														Deep Search
+													</button>
+													<button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-left hover:bg-primary/10 hover:text-primary flex items-center gap-2 transition-colors">
+														<span className="material-symbols-outlined text-sm">
+															content_copy
+														</span>
+														Copy Value
+													</button>
+													<button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-left hover:bg-error/10 text-error flex items-center gap-2 transition-colors">
+														<span className="material-symbols-outlined text-sm">
+															block
+														</span>
+														Blacklist
+													</button>
+												</div>
 											</td>
 										</tr>
 									))}
@@ -553,7 +575,7 @@ export default function AnalysisDetailPage() {
 				{/* Attachments */}
 				<div className="col-span-12 lg:col-span-6">
 					<div className="glass-panel rounded-xl p-6">
-						<h3 className="text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2 font-[family-name:var(--font-headline)]">
+						<h3 className="text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2 font-headline">
 							<span className="material-symbols-outlined text-error text-lg">
 								attachment
 							</span>
@@ -616,20 +638,20 @@ export default function AnalysisDetailPage() {
 									</span>
 								</Link>
 								<Link
-									href={`/analysis/${emailId}/map`}
+									href={`/analysis/${emailId}/graph`}
 									className="p-4 bg-surface-container-high rounded-lg border border-outline-variant/10 hover:border-tertiary/30 transition-all flex flex-col items-center gap-2 text-center"
 								>
 									<span className="material-symbols-outlined text-tertiary text-2xl">
-										public
+										hub
 									</span>
 									<span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-										GeoIP Map
+										Graph View
 									</span>
 								</Link>
-							<button className="p-4 bg-surface-container-high rounded-lg border border-outline-variant/10 hover:border-dracula-red/30 transition-all flex flex-col items-center gap-2 text-center">
-								<span className="material-symbols-outlined text-dracula-red text-2xl">
-									download
-								</span>
+								<button className="p-4 bg-surface-container-high rounded-lg border border-outline-variant/10 hover:border-dracula-red/30 transition-all flex flex-col items-center gap-2 text-center">
+									<span className="material-symbols-outlined text-dracula-red text-2xl">
+										download
+									</span>
 									<span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
 										Export PDF
 									</span>

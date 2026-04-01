@@ -1,0 +1,325 @@
+$ next dev
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.194.16.230:3000
+✓ Ready in 282ms
+
+ GET / 200 in 351ms (next.js: 135ms, application-code: 216ms)
+ GET /analysis/demoid1 200 in 599ms (next.js: 520ms, application-code: 79ms)
+ GET / 200 in 23ms (next.js: 4ms, application-code: 19ms)
+ GET /graph 200 in 114ms (next.js: 93ms, application-code: 21ms)
+ GET / 200 in 18ms (next.js: 3ms, application-code: 16ms)
+ GET /upload 200 in 285ms (next.js: 261ms, application-code: 24ms)
+ GET /analysis 200 in 86ms (next.js: 48ms, application-code: 38ms)
+ GET /analysis/demoid2 200 in 89ms (next.js: 32ms, application-code: 57ms)
+ GET /analysis/demoid2/map 200 in 367ms (next.js: 342ms, application-code: 25ms)
+ GET /analysis/demoid2/terminal 200 in 393ms (next.js: 371ms, application-code: 21ms)
+ GET /analysis/demoid2 200 in 47ms (next.js: 32ms, application-code: 16ms)
+ GET /analysis/demoid2/map 200 in 56ms (next.js: 33ms, application-code: 23ms)
+ GET / 200 in 16ms (next.js: 3ms, application-code: 13ms)
+ GET /upload 200 in 20ms (next.js: 4ms, application-code: 16ms)
+ GET / 200 in 16ms (next.js: 2ms, application-code: 14ms)
+ GET /reports 200 in 102ms (next.js: 30ms, application-code: 73ms)
+ GET /settings 200 in 45ms (next.js: 25ms, application-code: 20ms)
+ GET /upload 200 in 17ms (next.js: 2ms, application-code: 15ms)
+ GET / 200 in 16ms (next.js: 3ms, application-code: 13ms)
+ GET /graph 200 in 22ms (next.js: 2ms, application-code: 19ms)
+ GET /graph 200 in 138ms (next.js: 3ms, application-code: 136ms)
+ GET / 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ GET /analysis/1ffb9001-5d79-4a6c-82ac-96094a2a4473 200 in 99ms (next.js: 37ms, application-code: 63ms)
+ GET /upload 200 in 20ms (next.js: 2ms, application-code: 18ms)
+ GET /sandbox 200 in 50ms (next.js: 33ms, application-code: 17ms)
+ GET /reports 200 in 21ms (next.js: 2ms, application-code: 19ms)
+ GET /settings 200 in 17ms (next.js: 2ms, application-code: 15ms)
+ GET /analysis 200 in 29ms (next.js: 2ms, application-code: 27ms)
+ GET /analysis/demoid3 200 in 91ms (next.js: 35ms, application-code: 55ms)
+ GET /upload 200 in 559ms (next.js: 439ms, application-code: 120ms)
+ GET /upload 200 in 15ms (next.js: 2ms, application-code: 13ms)
+ GET /upload 200 in 16ms (next.js: 1930µs, application-code: 14ms)
+ GET /upload 200 in 16ms (next.js: 1929µs, application-code: 14ms)
+✓ Compiled in 756ms
+ GET /upload 200 in 53ms (next.js: 5ms, application-code: 47ms)
+✓ Compiled in 137ms
+ GET /upload 200 in 214ms (next.js: 102ms, application-code: 112ms)
+ GET /upload 200 in 115ms (next.js: 3ms, application-code: 113ms)
+ GET /upload 200 in 118ms (next.js: 1976µs, application-code: 116ms)
+ GET /upload 200 in 122ms (next.js: 3ms, application-code: 119ms)
+ GET /upload 200 in 136ms (next.js: 3ms, application-code: 133ms)
+ GET /upload 200 in 142ms (next.js: 3ms, application-code: 139ms)
+ GET /upload 200 in 146ms (next.js: 3ms, application-code: 143ms)
+ GET /upload 200 in 146ms (next.js: 4ms, application-code: 142ms)
+ GET /upload 200 in 147ms (next.js: 4ms, application-code: 144ms)
+ GET /upload 200 in 146ms (next.js: 3ms, application-code: 143ms)
+ GET /upload 200 in 145ms (next.js: 3ms, application-code: 141ms)
+ GET /upload 200 in 141ms (next.js: 3ms, application-code: 138ms)
+ GET /upload 200 in 143ms (next.js: 3ms, application-code: 141ms)
+ GET /upload 200 in 145ms (next.js: 4ms, application-code: 141ms)
+ GET /upload 200 in 141ms (next.js: 3ms, application-code: 138ms)
+ GET /upload 200 in 132ms (next.js: 4ms, application-code: 128ms)
+ GET /upload 200 in 132ms (next.js: 3ms, application-code: 129ms)
+ GET /upload 200 in 109ms (next.js: 4ms, application-code: 106ms)
+ GET /upload 200 in 106ms (next.js: 3ms, application-code: 103ms)
+ GET /upload 200 in 138ms (next.js: 2ms, application-code: 136ms)
+ GET /upload 200 in 116ms (next.js: 2ms, application-code: 114ms)
+ GET /upload 200 in 89ms (next.js: 5ms, application-code: 84ms)
+ GET /upload 200 in 61ms (next.js: 4ms, application-code: 58ms)
+ GET /upload 200 in 34ms (next.js: 7ms, application-code: 27ms)
+✓ Compiled in 65ms
+ GET /upload 200 in 113ms (next.js: 29ms, application-code: 84ms)
+ GET /upload 200 in 132ms (next.js: 2ms, application-code: 130ms)
+ GET /upload 200 in 139ms (next.js: 2ms, application-code: 136ms)
+ GET /upload 200 in 123ms (next.js: 4ms, application-code: 119ms)
+ GET /upload 200 in 115ms (next.js: 3ms, application-code: 111ms)
+ GET /upload 200 in 230ms (next.js: 3ms, application-code: 227ms)
+ GET /upload 200 in 206ms (next.js: 3ms, application-code: 203ms)
+ GET /upload 200 in 204ms (next.js: 2ms, application-code: 201ms)
+ GET /upload 200 in 204ms (next.js: 2ms, application-code: 202ms)
+ GET /upload 200 in 185ms (next.js: 72ms, application-code: 114ms)
+ GET /upload 200 in 117ms (next.js: 3ms, application-code: 114ms)
+ GET /upload 200 in 113ms (next.js: 3ms, application-code: 110ms)
+ GET /upload 200 in 107ms (next.js: 3ms, application-code: 104ms)
+ GET /upload 200 in 109ms (next.js: 3ms, application-code: 106ms)
+ GET /upload 200 in 105ms (next.js: 2ms, application-code: 103ms)
+ GET /upload 200 in 111ms (next.js: 1942µs, application-code: 109ms)
+ GET /upload 200 in 111ms (next.js: 1957µs, application-code: 109ms)
+ GET /upload 200 in 112ms (next.js: 3ms, application-code: 109ms)
+ GET /upload 200 in 109ms (next.js: 2ms, application-code: 106ms)
+ GET /upload 200 in 105ms (next.js: 2ms, application-code: 102ms)
+ GET /upload 200 in 97ms (next.js: 1975µs, application-code: 95ms)
+ GET /upload 200 in 95ms (next.js: 2ms, application-code: 93ms)
+ GET /upload 200 in 99ms (next.js: 1949µs, application-code: 97ms)
+ GET /upload 200 in 95ms (next.js: 2ms, application-code: 93ms)
+ GET /upload 200 in 97ms (next.js: 1958µs, application-code: 95ms)
+ GET /upload 200 in 98ms (next.js: 1882µs, application-code: 96ms)
+ GET /upload 200 in 97ms (next.js: 7ms, application-code: 91ms)
+ GET /upload 200 in 76ms (next.js: 1919µs, application-code: 74ms)
+ GET /upload 200 in 56ms (next.js: 2ms, application-code: 54ms)
+ GET /upload 200 in 38ms (next.js: 2ms, application-code: 36ms)
+ GET /upload 200 in 21ms (next.js: 1829µs, application-code: 19ms)
+✓ Compiled in 86ms
+ GET /upload 200 in 33ms (next.js: 1945µs, application-code: 31ms)
+✓ Compiled in 84ms
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+✓ Compiled in 539ms
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+✓ Compiled in 942ms
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+✓ Compiled in 26ms
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+ GET /upload 500 in 586ms (next.js: 403ms, application-code: 183ms)
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+[browser] Uncaught Error: ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error
+
+
+    at <unknown> (Error: ./src/app/analysis/page.tsx:1:10)
+    at <unknown> (Error: (./src/app/analysis/page.tsx:1:10)
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+ GET / 500 in 17ms (next.js: 9ms, application-code: 8ms)
+[browser] Uncaught Error: ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error
+
+
+    at <unknown> (Error: ./src/app/analysis/page.tsx:1:10)
+    at <unknown> (Error: (./src/app/analysis/page.tsx:1:10)
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+[browser] ./src/app/analysis/page.tsx:1:10
+You're importing a module that depends on `useState` into a React Server Component module. This API is only available in Client Components. To fix, mark the file (or its parent) with the `"use client"` directive.
+    Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+> 1 | import { useState } from "react";
+    |          ^^^^^^^^
+  2 | import { formatUtcDateTime } from "@/lib/format";
+  3 |
+  4 | const DUMMY_ANALYSES = [
+
+Ecmascript file had an error 
+✓ Compiled in 471ms
+ GET / 200 in 413ms (next.js: 169ms, application-code: 245ms)
+ GET / 200 in 63ms (next.js: 5ms, application-code: 58ms)
+ GET /upload 200 in 41ms (next.js: 21ms, application-code: 20ms)
+ GET /analysis 200 in 37ms (next.js: 20ms, application-code: 17ms)
+ GET /analysis/demoid1 200 in 167ms (next.js: 73ms, application-code: 94ms)
+ GET / 200 in 16ms (next.js: 2ms, application-code: 14ms)
+ GET /analysis 200 in 20ms (next.js: 2ms, application-code: 18ms)
+ GET /analysis/demoid1 200 in 94ms (next.js: 37ms, application-code: 57ms)
+ GET /analysis/demoid1/terminal 200 in 88ms (next.js: 66ms, application-code: 22ms)
+ GET /analysis/demoid1 200 in 54ms (next.js: 37ms, application-code: 17ms)
+○ Compiling /analysis/[emailId]/graph ...
+ GET /analysis/demoid1/graph 200 in 12.0s (next.js: 11.8s, application-code: 207ms)
+ GET /analysis/demoid1/graph 200 in 134ms (next.js: 61ms, application-code: 73ms)
+ GET /analysis/demoid1/graph 200 in 4.5s (next.js: 4.2s, application-code: 259ms)
+ GET /analysis/demoid1/graph 200 in 78ms (next.js: 6ms, application-code: 72ms)
+ GET /analysis/demoid1/graph 200 in 71ms (next.js: 6ms, application-code: 65ms)
+ GET /analysis/demoid1/graph 200 in 38ms (next.js: 6ms, application-code: 32ms)
+[browser] Failed to load email graph data ApiError: API 404: {"error":{"message":"Email 'demoid1' not found","type":"not_found"}}
+    at apiFetch (src/lib/api.ts:119:9)
+    at async loadData (src/app/analysis/[emailId]/graph/page.tsx:51:20)
+  117 | 	if (!res.ok) {
+  118 | 		const body = await res.text().catch(() => "");
+> 119 | 		throw new ApiError(
+      |       ^
+  120 | 			res.status,
+  121 | 			`API ${res.status}: ${body || res.statusText}`,
+  122 | 		); (src/app/analysis/[emailId]/graph/page.tsx:54:13)
+[browser] Failed to load email graph data ApiError: API 404: {"error":{"message":"Email 'demoid1' not found","type":"not_found"}}
+    at apiFetch (src/lib/api.ts:119:9)
+    at async loadData (src/app/analysis/[emailId]/graph/page.tsx:51:20)
+  117 | 	if (!res.ok) {
+  118 | 		const body = await res.text().catch(() => "");
+> 119 | 		throw new ApiError(
+      |       ^
+  120 | 			res.status,
+  121 | 			`API ${res.status}: ${body || res.statusText}`,
+  122 | 		); (src/app/analysis/[emailId]/graph/page.tsx:54:13)
+[browser] Failed to load email graph data ApiError: API 404: {"error":{"message":"Email 'demoid1' not found","type":"not_found"}}
+    at apiFetch (src/lib/api.ts:119:9)
+    at async loadData (src/app/analysis/[emailId]/graph/page.tsx:51:20)
+  117 | 	if (!res.ok) {
+  118 | 		const body = await res.text().catch(() => "");
+> 119 | 		throw new ApiError(
+      |       ^
+  120 | 			res.status,
+  121 | 			`API ${res.status}: ${body || res.statusText}`,
+  122 | 		); (src/app/analysis/[emailId]/graph/page.tsx:54:13)
+ GET /analysis/demoid1 200 in 71ms (next.js: 48ms, application-code: 24ms)
+ GET /analysis/demoid1/graph 200 in 62ms (next.js: 41ms, application-code: 22ms)
+[browser] Failed to load email graph data ApiError: API 404: {"error":{"message":"Email 'demoid1' not found","type":"not_found"}}
+    at apiFetch (src/lib/api.ts:119:9)
+    at async loadData (src/app/analysis/[emailId]/graph/page.tsx:51:20)
+  117 | 	if (!res.ok) {
+  118 | 		const body = await res.text().catch(() => "");
+> 119 | 		throw new ApiError(
+      |       ^
+  120 | 			res.status,
+  121 | 			`API ${res.status}: ${body || res.statusText}`,
+  122 | 		); (src/app/analysis/[emailId]/graph/page.tsx:54:13)
+[browser] Failed to load email graph data ApiError: API 404: {"error":{"message":"Email 'demoid1' not found","type":"not_found"}}
+    at apiFetch (src/lib/api.ts:119:9)
+    at async loadData (src/app/analysis/[emailId]/graph/page.tsx:51:20)
+  117 | 	if (!res.ok) {
+  118 | 		const body = await res.text().catch(() => "");
+> 119 | 		throw new ApiError(
+      |       ^
+  120 | 			res.status,
+  121 | 			`API ${res.status}: ${body || res.statusText}`,
+  122 | 		); (src/app/analysis/[emailId]/graph/page.tsx:54:13)
+ GET / 200 in 16ms (next.js: 2ms, application-code: 14ms)
+ GET /graph 200 in 41ms (next.js: 21ms, application-code: 20ms)
+✓ Compiled in 125ms
+✓ Compiled in 37ms
+ GET /graph 200 in 98ms (next.js: 6ms, application-code: 93ms)
+ GET / 200 in 20ms (next.js: 4ms, application-code: 17ms)
+ GET /analysis/1ffb9001-5d79-4a6c-82ac-96094a2a4473 200 in 109ms (next.js: 47ms, application-code: 62ms)
+ GET /sandbox 200 in 408ms (next.js: 387ms, application-code: 21ms)
+ GET /reports 200 in 458ms (next.js: 427ms, application-code: 31ms)
+ GET /settings 200 in 568ms (next.js: 544ms, application-code: 24ms)
+ GET / 200 in 17ms (next.js: 3ms, application-code: 14ms)
+[browser] Failed to load email graph data ApiError: API 404: {"error":{"message":"Email 'demoid1' not found","type":"not_found"}}
+    at apiFetch (src/lib/api.ts:119:9)
+    at async loadData (src/app/analysis/[emailId]/graph/page.tsx:51:20)
+  117 | 	if (!res.ok) {
+  118 | 		const body = await res.text().catch(() => "");
+> 119 | 		throw new ApiError(
+      |       ^
+  120 | 			res.status,
+  121 | 			`API ${res.status}: ${body || res.statusText}`,
+  122 | 		); (src/app/analysis/[emailId]/graph/page.tsx:54:13)

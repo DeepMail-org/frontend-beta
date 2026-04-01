@@ -3,17 +3,16 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { ApiError, getDashboard } from "@/lib/api";
-import {
-	DashboardData,
-	RecentAnalysis,
-	TrendDataPoint,
-} from "@/lib/types";
+import { DashboardData, RecentAnalysis, TrendDataPoint } from "@/lib/types";
 import { formatUtcTime } from "@/lib/format";
 import Link from "next/link";
 
-const ThreatGraph = dynamic(() => import("@/components/dashboard/ThreatGraph"), {
-	ssr: false,
-});
+const ThreatGraph = dynamic(
+	() => import("@/components/dashboard/ThreatGraph"),
+	{
+		ssr: false,
+	},
+);
 
 const DEMO_RECENT_ANALYSES: RecentAnalysis[] = [
 	{
@@ -719,7 +718,6 @@ export default function DashboardPage() {
 								</p>
 							)}
 
-							{/* Real-Time Geolocation Graph (Obsidian Style) */}
 							<div className="pt-4 mt-4 border-t border-outline-variant/10">
 								<div className="flex items-center justify-between mb-4">
 									<h3 className="text-[10px] font-black tracking-widest uppercase text-white/30">

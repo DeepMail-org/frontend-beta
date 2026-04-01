@@ -100,13 +100,17 @@ const ThreatGraph = forwardRef<ThreatGraphHandle, ThreatGraphProps>(
 		useEffect(() => {
 			const timer = setTimeout(() => {
 				if (fgRef.current && (graphData.nodes?.length || 0) > 0) {
-					// Use larger padding to avoid controls (150px)
-					fgRef.current.zoomToFit(800, 150);
+					// Use smaller padding for small containers (dashboard)
+					const padding = Math.max(
+						20,
+						Math.min(width, height) * 0.15,
+					);
+					fgRef.current.zoomToFit(800, padding);
 					fgRef.current.centerAt(0, 0, 400);
 				}
 			}, 300);
 			return () => clearTimeout(timer);
-		}, [graphData.nodes?.length]);
+		}, [graphData.nodes?.length, width, height]);
 
 		const nodeColors: Record<string, string> = {
 			email: "#bd93f9", // Dracula Purple

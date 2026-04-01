@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import GraphSidebar from "@/components/graph/GraphSidebar";
-import { useThreatGraph } from "@/hooks/useThreatGraph";
-import { getDashboard, getResults } from "@/lib/api";
-import { AnimatePresence } from "motion/react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
+import { getResults } from "@/lib/api";
+import { useThreatGraph } from "@/hooks/useThreatGraph";
 import type { ThreatGraphHandle } from "@/components/dashboard/ThreatGraph";
+import { AnimatePresence } from "motion/react";
+import GraphSidebar from "@/components/graph/GraphSidebar";
 
 const ThreatGraph = dynamic(
 	() => import("@/components/dashboard/ThreatGraph"),
@@ -16,7 +17,11 @@ const ThreatGraph = dynamic(
 	},
 );
 
-export default function InvestigationPage() {
+export default function EmailGraphPage() {
+	const params = useParams();
+	const emailId = params.emailId as string;
+	const graphRef = useRef<ThreatGraphHandle>(null);
+
 	const {
 		graphData,
 		addEmailAnalysis,
@@ -25,7 +30,6 @@ export default function InvestigationPage() {
 		toggleNodeCollapse,
 	} = useThreatGraph();
 
-	const graphRef = useRef<ThreatGraphHandle>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -42,42 +46,55 @@ export default function InvestigationPage() {
 	}, []);
 
 	useEffect(() => {
-		async function loadInitialData() {
+		async function loadData() {
 			try {
-				const dashboard = await getDashboard();
-				// For each recent analysis, fetch full details to build the graph
-				// In a real app, we might just fetch the IOCs or use a dedicated endpoint
-				const detailPromises = dashboard.recent_analyses
-					.slice(0, 10)
-					.map((a) => getResults(a.id));
-				const reports = await Promise.all(detailPromises);
-				reports.forEach((report) => addEmailAnalysis(report));
+				const report = await getResults(emailId);
+				addEmailAnalysis(report);
 			} catch (error) {
-				console.error("Failed to load graph data", error);
+				console.error("Failed to load email graph data", error);
 			} finally {
 				setIsLoading(false);
 			}
 		}
-		loadInitialData();
-	}, [addEmailAnalysis]);
+		loadData();
+	}, [emailId, addEmailAnalysis]);
 
 	return (
 		<main className="relative flex-1 bg-[#06080f] overflow-hidden flex flex-col font-body">
-			{/* Main Canvas Area */}
+			{/* Breadcrumb Header */}
+			<div className="absolute top-6 left-8 z-30 flex items-center gap-2 text-xs text-white/40">
+				<Link href="/" className="hover:text-primary transition-colors">
+					Dashboard
+				</Link>
+				<span className="material-symbols-outlined text-xs">
+					chevron_right
+				</span>
+				<Link
+					href={`/analysis/${emailId}`}
+					className="hover:text-primary transition-colors"
+				>
+					Analysis
+				</Link>
+				<span className="material-symbols-outlined text-xs">
+					chevron_right
+				</span>
+				<span className="text-white font-bold">Graph Perspective</span>
+			</div>
+
 			<div className="flex-1 relative">
 				{isLoading ? (
 					<div className="absolute inset-0 flex items-center justify-center flex-col gap-4">
 						<div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
 						<p className="text-[10px] font-black tracking-[0.4em] uppercase text-white/30 animate-pulse">
-							Initializing Neural Map...
+							Mapping IOC Relations...
 						</p>
 					</div>
 				) : (
 					<ThreatGraph
 						ref={graphRef}
 						graphData={graphData}
-						width={dimensions.width - 256} // Account for sidebar
-						height={dimensions.height - 64} // Account for topbar
+						width={dimensions.width - 256}
+						height={dimensions.height - 64}
 						onNodeClick={(node) =>
 							setSelectedNodeId(node?.id || null)
 						}
@@ -118,7 +135,7 @@ export default function InvestigationPage() {
 					</div>
 				</div>
 
-				{/* Legend (Bottom Right) */}
+				{/* Legend */}
 				<div className="absolute right-8 bottom-8 z-20 flex gap-6 px-6 py-4 bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 pointer-events-none">
 					{[
 						{ label: "Email", color: "#bd93f9" },
