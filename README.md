@@ -10,8 +10,8 @@ authentication tokens.
 
 ```
 ┌─────────────────────────┐
-│   Next.js 16 App Router  │
-│   (Server + Client)      │
+│   Next.js 16 App Router │
+│   (Server + Client)     │
 └────────────┬────────────┘
              │
     ┌────────┴────────┐
@@ -35,17 +35,17 @@ authentication tokens.
 
 ## Pages
 
-| Path | Description |
-|------|-------------|
-| `/` | Dashboard with threat overview |
-| `/upload` | Email file upload interface |
-| `/analysis` | List of analyzed emails |
-| `/analysis/[emailId]` | Detailed analysis of a specific email |
-| `/analysis/[emailId]/map` | Geolocation map visualization |
-| `/analysis/[emailId]/terminal` | Terminal-style IOC display |
-| `/reports` | Threat reports |
-| `/sandbox` | Sandbox execution results |
-| `/settings` | Token management and settings |
+| Path                           | Description                           |
+| ------------------------------ | ------------------------------------- |
+| `/`                            | Dashboard with threat overview        |
+| `/upload`                      | Email file upload interface           |
+| `/analysis`                    | List of analyzed emails               |
+| `/analysis/[emailId]`          | Detailed analysis of a specific email |
+| `/analysis/[emailId]/map`      | Geolocation map visualization         |
+| `/analysis/[emailId]/terminal` | Terminal-style IOC display            |
+| `/reports`                     | Threat reports                        |
+| `/sandbox`                     | Sandbox execution results             |
+| `/settings`                    | Token management and settings         |
 
 ## Authentication
 
@@ -60,7 +60,7 @@ The frontend supports JWT token-based authentication:
 
 - `ApiError` class: Custom error with status code, message, and details
 - `getToken()`: Retrieve token from localStorage
-- `setToken(token)`: Store token in localStorage  
+- `setToken(token)`: Store token in localStorage
 - `clearToken()`: Remove token from localStorage
 - All API calls include token in `Authorization: Bearer <token>` header
 
@@ -68,12 +68,12 @@ The frontend supports JWT token-based authentication:
 
 The UI uses a Dracula-inspired color palette for threat levels:
 
-| Level | Color | Hex | Usage |
-|-------|-------|-----|-------|
-| Critical | Red | `#ff5555` | High-severity threats, errors |
-| Suspicious | Orange | `#ffb86c` | Medium-severity, warnings |
-| Safe | Green | `#50fa7b` | Low/clean results |
-| Neutral | Gray | `#6272a4` | Unknown, informational |
+| Level      | Color  | Hex       | Usage                         |
+| ---------- | ------ | --------- | ----------------------------- |
+| Critical   | Red    | `#ff5555` | High-severity threats, errors |
+| Suspicious | Orange | `#ffb86c` | Medium-severity, warnings     |
+| Safe       | Green  | `#50fa7b` | Low/clean results             |
+| Neutral    | Gray   | `#6272a4` | Unknown, informational        |
 
 ## Map Experience (Backend-Driven)
 
@@ -86,14 +86,14 @@ The UI uses a Dracula-inspired color palette for threat levels:
 
 ### Map Folder / Function Guide
 
-| File | Main function/component | Responsibility |
-|---|---|---|
-| `src/components/map/WorldMap.tsx` | `WorldMap` | SSR-safe dynamic wrapper for map canvas |
-| `src/components/map/WorldMapCanvas.tsx` | `WorldMapCanvas` | Leaflet canvas, marker render, hop path polylines, zoom controls |
-| `src/components/map/IpMarker.tsx` | `IpMarker` | Risk-colored marker node with tooltip |
-| `src/components/map/IpSidebar.tsx` | `IpSidebar` | Selected-node detail pane + report navigation |
-| `src/components/map/HopTimeline.tsx` | `HopTimeline` | Received-chain slider/playback UI |
-| `src/app/analysis/[emailId]/map/page.tsx` | `MapPage` | Fetches report and composes map + sidebar + timeline |
+| File                                      | Main function/component | Responsibility                                                   |
+| ----------------------------------------- | ----------------------- | ---------------------------------------------------------------- |
+| `src/components/map/WorldMap.tsx`         | `WorldMap`              | SSR-safe dynamic wrapper for map canvas                          |
+| `src/components/map/WorldMapCanvas.tsx`   | `WorldMapCanvas`        | Leaflet canvas, marker render, hop path polylines, zoom controls |
+| `src/components/map/IpMarker.tsx`         | `IpMarker`              | Risk-colored marker node with tooltip                            |
+| `src/components/map/IpSidebar.tsx`        | `IpSidebar`             | Selected-node detail pane + report navigation                    |
+| `src/components/map/HopTimeline.tsx`      | `HopTimeline`           | Received-chain slider/playback UI                                |
+| `src/app/analysis/[emailId]/map/page.tsx` | `MapPage`               | Fetches report and composes map + sidebar + timeline             |
 
 ## Tech Stack
 
@@ -132,6 +132,6 @@ bun run test:contract
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
+| Variable              | Description                                      |
+| --------------------- | ------------------------------------------------ |
 | `NEXT_PUBLIC_API_URL` | Backend API URL (default: http://localhost:8000) |
