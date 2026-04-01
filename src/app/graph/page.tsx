@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import ThreatGraph, {
-	ThreatGraphHandle,
-} from "@/components/dashboard/ThreatGraph";
+import dynamic from "next/dynamic";
 import GraphSidebar from "@/components/graph/GraphSidebar";
 import { useThreatGraph } from "@/hooks/useThreatGraph";
 import { getDashboard, getResults } from "@/lib/api";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import Link from "next/link";
+import type { ThreatGraphHandle } from "@/components/dashboard/ThreatGraph";
+
+const ThreatGraph = dynamic(() => import("@/components/dashboard/ThreatGraph"), {
+	ssr: false,
+});
 
 export default function InvestigationPage() {
 	const {
@@ -119,32 +122,35 @@ export default function InvestigationPage() {
 				)}
 
 				{/* Floating Controls */}
-				<div className="absolute left-10 bottom-10 z-50 flex flex-col gap-4">
-					<div className="bg-[#12141c] border border-white/10 p-2.5 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-2 backdrop-blur-3xl">
+				<div className="absolute left-4 md:left-10 bottom-4 md:bottom-10 z-[60] flex flex-col gap-3">
+					<div className="bg-[#12141c]/95 border border-white/20 p-2.5 rounded-[22px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-2 backdrop-blur-3xl">
 						<button
 							onClick={() => graphRef.current?.zoomIn()}
-							className="w-12 h-12 rounded-2xl flex items-center justify-center text-white/90 hover:bg-primary hover:text-on-primary transition-all bg-white/5 border border-white/5 group"
+							className="w-12 h-12 rounded-2xl flex items-center justify-center text-white hover:bg-primary hover:text-on-primary transition-all bg-white/10 border border-white/15 group"
 							title="Zoom In"
+							aria-label="Zoom In"
 						>
-							<span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">
+							<span className="material-symbols-outlined text-lg leading-none group-hover:scale-110 transition-transform">
 								add
 							</span>
 						</button>
 						<div className="h-px bg-white/5 mx-2" />
 						<button
 							onClick={() => graphRef.current?.zoomOut()}
-							className="w-12 h-12 rounded-2xl flex items-center justify-center text-white/90 hover:bg-primary hover:text-on-primary transition-all bg-white/5 border border-white/5 group"
+							className="w-12 h-12 rounded-2xl flex items-center justify-center text-white hover:bg-primary hover:text-on-primary transition-all bg-white/10 border border-white/15 group"
 							title="Zoom Out"
+							aria-label="Zoom Out"
 						>
-							<span className="material-symbols-outlined text-lg group-hover:scale-90 transition-transform">
+							<span className="material-symbols-outlined text-lg leading-none group-hover:scale-90 transition-transform">
 								remove
 							</span>
 						</button>
 					</div>
 					<button
 						onClick={() => graphRef.current?.center()}
-						className="w-12 h-12 rounded-[22px] bg-primary text-on-primary flex items-center justify-center shadow-[0_10px_30px_rgba(0,184,212,0.3)] transform hover:scale-105 active:scale-95 transition-all border border-white/10 group"
+						className="w-12 h-12 rounded-[22px] bg-primary text-on-primary flex items-center justify-center shadow-[0_10px_30px_rgba(0,184,212,0.3)] transform hover:scale-105 active:scale-95 transition-all border border-white/20 group"
 						title="Center View"
+						aria-label="Center View"
 					>
 						<span className="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">
 							my_location

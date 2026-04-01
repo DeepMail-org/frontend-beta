@@ -2,288 +2,186 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { getResults } from "@/lib/api";
-import { EmailAnalysisReport, GeoPoint } from "@/lib/types";
-import ThreatGlobe from "@/components/dashboard/ThreatGlobe";
-
-type IocMetadata = {
-	lat?: number;
-	lon?: number;
-	country?: string;
-	tags?: string[];
-	malicious?: boolean;
-};
-
-// Hash function to deterministically assign coordinates to IOCs without GeoIP data
-function hashStringToCoordinates(str: string): {
-	lat: number;
-	lon: number;
-	country: string;
-} {
-	let hash = 0;
-	for (let i = 0; i < str.length; i++) {
-		hash = (hash << 5) - hash + str.charCodeAt(i);
-		hash |= 0;
-	}
-
-	const random = (seed: number) => {
-		const x = Math.sin(seed++) * 10000;
-		return x - Math.floor(x);
-	};
-
-	// Generate somewhat realistic latitudes (mostly northern hemisphere + some south)
-	const latRaw = random(hash) * 140 - 60;
-	// Generate longitudes all around
-	const lonRaw = random(hash + 1) * 360 - 180;
-
-	const regions = [
-		"Unknown",
-		"North America",
-		"Europe",
-		"Asia Pacific",
-		"South America",
-		"Middle East",
-	];
-	const country = regions[Math.floor(random(hash + 2) * regions.length)];
-
-	return { lat: latRaw, lon: lonRaw, country };
-}
+import type { EmailAnalysisReport, GeoMapPoint, HopTimelinePoint } from "@/lib/types";
+import WorldMap from "@/components/map/WorldMap";
+import IpSidebar from "@/components/map/IpSidebar";
+import HopTimeline from "@/components/map/HopTimeline";
 
 export default function MapPage() {
 	const params = useParams();
 	const emailId = params.emailId as string;
-	const [report, setReport] = useState<EmailAnalysisReport | null>(null);
-	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		async function fetchReport() {
-			try {
-				const res = await getResults(emailId);
-				setReport(res);
-			} catch (err) {
-				console.error("Failed to fetch Map Report", err);
-			} finally {
-				setLoading(false);
-			}
+	const [report, setReport] = useState<EmailAnalysisReport | null>(null);
+	const [points, setPoints] = useState<GeoMapPoint[]>([]);
+	const [hops, setHops] = useState<HopTimelinePoint[]>([]);
+	const [selected, setSelected] = useState<GeoMapPoint | null>(null);
+	const [activeHop, setActiveHop] = useState(0);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	const load = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+		setSelected(null);
+		setActiveHop(0);
+
+		try {
+			const data = await getResults(emailId);
+			setReport(data);
+			setPoints(data.geo_points ?? []);
+			setHops(data.hop_timeline ?? []);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Failed to load map data.");
+			setReport(null);
+			setPoints([]);
+			setHops([]);
+		} finally {
+			setLoading(false);
 		}
-		if (emailId) fetchReport();
 	}, [emailId]);
 
-	const iocs = report?.iocs || [];
+	useEffect(() => {
+		void load();
+	}, [load]);
 
-	// Map database IOCs to Map locations
-	const mappedLocations = iocs.map((ioc) => {
-		let lat = 0,
-			lon = 0,
-			country = "Unknown Location";
-		let hasGeoCoordinates = false;
-		let parsedMeta: IocMetadata = {};
-		if (ioc.metadata) {
-			try {
-				parsedMeta = JSON.parse(ioc.metadata) as IocMetadata;
-				if (
-					Number.isFinite(parsedMeta.lat) &&
-					Number.isFinite(parsedMeta.lon)
-				) {
-					lat = Number(parsedMeta.lat);
-					lon = Number(parsedMeta.lon);
-					country = parsedMeta.country || country;
-					hasGeoCoordinates = true;
-				}
-			} catch {
-				parsedMeta = {};
-			}
-		}
+	const riskCounts = useMemo(() => {
+		return points.reduce(
+			(acc, point) => {
+				acc[point.risk] += 1;
+				return acc;
+			},
+			{ critical: 0, high: 0, medium: 0, low: 0 },
+		);
+	}, [points]);
 
-		// Fallback to deterministic pseudo-random coordinates if GeoLocation is missing
-		// This keeps the map populated and engaging, plotting actual IOCs.
-		if (!hasGeoCoordinates) {
-			const coords = hashStringToCoordinates(ioc.value);
-			lat = coords.lat;
-			lon = coords.lon;
-			country = coords.country;
-		}
-
-		// Determine risk level based on tags or defaults
-		let risk = "low";
-		if (parsedMeta.tags?.includes("malicious") || parsedMeta.malicious) {
-			risk = "critical";
-		} else if (ioc.ioc_type === "url" || ioc.ioc_type === "domain") {
-			risk = "high";
-		} else if (ioc.ioc_type === "ip") {
-			risk = "medium";
-		}
-
-		return {
-			id: ioc.id,
-			type: ioc.ioc_type,
-			value: ioc.value,
-			lat,
-			lon,
-			country,
-			risk,
-		};
-	});
-
-	const riskClassMap: Record<string, { dot: string; text: string }> = {
-		critical: { dot: "bg-error", text: "text-error" },
-		high: { dot: "bg-primary-container", text: "text-primary-container" },
-		medium: { dot: "bg-primary", text: "text-primary" },
-		low: { dot: "bg-tertiary", text: "text-tertiary" },
-	};
+	const unresolvedCount = Math.max((report?.iocs.filter((ioc) => ioc.ioc_type === "ip").length ?? 0) - points.length, 0);
+	const hasCandidates = points.length > 0;
 
 	if (loading) {
 		return (
 			<div className="p-12 text-center text-outline animate-pulse font-bold tracking-widest uppercase">
-				Initializing Threat Map...
+				Initializing geolocation map...
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="p-8 lg:p-12 max-w-4xl mx-auto">
+				<div className="glass-panel rounded-xl p-8 text-center space-y-4">
+					<span className="material-symbols-outlined text-4xl text-error">error</span>
+					<h2 className="text-xl font-bold text-on-surface">Map loading failed</h2>
+					<p className="text-sm text-on-surface-variant">{error}</p>
+					<button
+						onClick={() => void load()}
+						className="px-4 py-2 rounded-lg bg-primary text-on-primary text-xs font-bold uppercase tracking-widest"
+					>
+						Retry
+					</button>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="p-8 lg:p-12 space-y-8 max-w-7xl mx-auto">
-			{/* Breadcrumb */}
+		<div className="p-6 lg:p-10 space-y-6 max-w-[1600px] mx-auto">
 			<div className="flex items-center gap-2 text-xs text-on-surface-variant">
 				<Link href="/" className="hover:text-primary transition-colors">
 					Dashboard
 				</Link>
-				<span className="material-symbols-outlined text-xs">
-					chevron_right
-				</span>
-				<Link
-					href={`/analysis/${emailId}`}
-					className="hover:text-primary transition-colors"
-				>
+				<span className="material-symbols-outlined text-xs">chevron_right</span>
+				<Link href={`/analysis/${emailId}`} className="hover:text-primary transition-colors">
 					Analysis
 				</Link>
-				<span className="material-symbols-outlined text-xs">
-					chevron_right
-				</span>
+				<span className="material-symbols-outlined text-xs">chevron_right</span>
 				<span className="text-on-surface font-bold">GeoIP Map</span>
 			</div>
 
-			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 				<div>
 					<h2 className="text-3xl font-bold text-on-surface tracking-tight font-headline">
-						IOC <span className="text-tertiary">Geolocation</span>
+						Global <span className="text-primary">IP Geolocation</span>
 					</h2>
-					<p className="text-xs text-on-surface-variant mt-1">
-						Geographic distribution of extracted indicators
+					<p className="text-sm text-on-surface-variant mt-1">
+						Real coordinates resolved from IOC IPs and received header hops.
 					</p>
 				</div>
-				<div className="flex gap-2">
-					<span className="bg-error/10 text-error text-[10px] px-3 py-1.5 rounded-lg border border-error/20 font-bold flex items-center gap-1">
-						<span className="w-1.5 h-1.5 rounded-full bg-error" />{" "}
-						{
-							mappedLocations.filter((i) => i.risk === "critical")
-								.length
-						}{" "}
-						Critical
-					</span>
-					<span className="bg-primary-container/10 text-primary-container text-[10px] px-3 py-1.5 rounded-lg border border-primary-container/20 font-bold flex items-center gap-1">
-						<span className="w-1.5 h-1.5 rounded-full bg-primary-container" />{" "}
-						{
-							mappedLocations.filter((i) => i.risk === "high")
-								.length
-						}{" "}
-						High
-					</span>
-					<span className="bg-primary/10 text-primary text-[10px] px-3 py-1.5 rounded-lg border border-primary/20 font-bold flex items-center gap-1">
-						<span className="w-1.5 h-1.5 rounded-full bg-primary" />{" "}
-						{
-							mappedLocations.filter((i) => i.risk === "medium")
-								.length
-						}{" "}
-						Medium
-					</span>
-					<span className="bg-tertiary/10 text-tertiary text-[10px] px-3 py-1.5 rounded-lg border border-tertiary/20 font-bold flex items-center gap-1">
-						<span className="w-1.5 h-1.5 rounded-full bg-tertiary" />{" "}
-						{mappedLocations.filter((i) => i.risk === "low").length}{" "}
-						Low
-					</span>
+
+				<div className="flex flex-wrap gap-2">
+					{[
+						{ key: "critical", label: "Critical", color: "#ff5555", count: riskCounts.critical },
+						{ key: "high", label: "High", color: "#bd93f9", count: riskCounts.high },
+						{ key: "medium", label: "Medium", color: "#ffb86c", count: riskCounts.medium },
+						{ key: "low", label: "Low", color: "#50fa7b", count: riskCounts.low },
+					].map((chip) => (
+						<span
+							key={chip.key}
+							className="text-[10px] px-3 py-1.5 rounded-lg border font-bold uppercase tracking-wider flex items-center gap-2"
+							style={{
+								color: chip.color,
+								borderColor: `${chip.color}50`,
+								backgroundColor: `${chip.color}14`,
+							}}
+						>
+							<span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: chip.color }} />
+							{chip.count} {chip.label}
+						</span>
+					))}
 				</div>
 			</div>
 
-			{/* Globe + IOC List */}
-			<div className="grid grid-cols-12 gap-8">
-				{/* Globe Visualization */}
-				<div className="col-span-12 lg:col-span-8">
-					<div
-						className="glass-panel rounded-xl p-8 relative flex items-center justify-center overflow-hidden"
-						style={{ minHeight: "500px" }}
+			{!hasCandidates ? (
+				<div className="glass-panel rounded-xl p-10 text-center">
+					<span className="material-symbols-outlined text-4xl text-outline/70">travel_explore</span>
+					<h3 className="mt-3 text-lg font-bold text-on-surface">No IP addresses found</h3>
+					<p className="mt-2 text-sm text-on-surface-variant">
+						This report has no public IP indicators in IOC data or received headers.
+					</p>
+				</div>
+			) : (
+				<div className="grid grid-cols-12 gap-6">
+					<motion.div
+						initial={{ opacity: 0, y: 12 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.35 }}
+						className="col-span-12 xl:col-span-8"
 					>
-						<ThreatGlobe
-							geoPoints={mappedLocations as GeoPoint[]}
-							size={500}
-						/>
-						{/* Floating label */}
-						<div className="absolute top-6 left-6">
-							<p className="text-[10px] uppercase tracking-widest text-outline font-bold">
-								Threat Origin Map
-							</p>
+						<div className="glass-panel rounded-xl p-3 md:p-4 space-y-3">
+							<HopTimeline
+								hops={hops}
+								activeHop={activeHop}
+								onChange={setActiveHop}
+							/>
+							<div className="h-[420px] md:h-[560px] lg:h-[640px]">
+								<WorldMap
+									points={points}
+									selectedId={selected?.id ?? null}
+									onSelect={(point) => setSelected(point)}
+									hopPath={hops}
+									activeHop={activeHop}
+								/>
+							</div>
 						</div>
-					</div>
-				</div>
+					</motion.div>
 
-				{/* IOC Location List */}
-				<div className="col-span-12 lg:col-span-4">
-					<div className="glass-panel rounded-xl h-full flex flex-col">
-						<div className="px-6 py-5 border-b border-outline-variant/10">
-							<h4 className="text-sm font-bold tracking-widest uppercase font-headline">
-								IOC_ORIGINS
-							</h4>
-						</div>
-						<div className="flex-1 p-4 space-y-3 overflow-y-auto">
-							{mappedLocations.length === 0 ? (
-								<p className="text-xs text-outline text-center py-8">
-									No IOC routing data available
-								</p>
-							) : (
-								mappedLocations.map((ioc) => {
-									const classes =
-										riskClassMap[ioc.risk] ||
-										riskClassMap.low;
-									return (
-										<div
-											key={ioc.id}
-											className="p-4 bg-surface-container-low/50 rounded-lg hover:bg-surface-container-high/40 transition-colors"
-										>
-											<div className="flex items-start justify-between mb-2">
-												<div className="flex items-center gap-2">
-													<div
-														className={`w-2 h-2 rounded-full ${classes.dot}`}
-													/>
-													<span
-														className={`text-[10px] font-bold uppercase ${classes.text}`}
-													>
-														{ioc.risk}
-													</span>
-												</div>
-												<span className="text-[10px] text-outline uppercase bg-surface-container px-2 py-0.5 rounded">
-													{ioc.type}
-												</span>
-											</div>
-											<p className="text-xs font-mono text-on-surface break-all">
-												{ioc.value}
-											</p>
-											<div className="flex items-center gap-2 mt-2">
-												<span className="material-symbols-outlined text-xs text-outline">
-													location_on
-												</span>
-												<span className="text-[10px] text-on-surface-variant">
-													{ioc.country}
-												</span>
-											</div>
-										</div>
-									);
-								})
-							)}
-						</div>
-					</div>
+					<motion.div
+						initial={{ opacity: 0, y: 12 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.35, delay: 0.1 }}
+						className="col-span-12 xl:col-span-4"
+					>
+						<IpSidebar
+							emailId={emailId}
+							selected={selected}
+							totalPoints={points.length}
+							unresolvedCount={unresolvedCount}
+						/>
+					</motion.div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

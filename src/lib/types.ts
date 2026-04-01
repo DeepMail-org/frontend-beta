@@ -15,6 +15,32 @@ export interface EmailAnalysisReport {
 	analysis_results: AnalysisResultEntry[];
 	job_progress: JobProgressEntry[];
 	iocs: IocEntry[];
+	geo_points?: GeoMapPoint[];
+	hop_timeline?: HopTimelinePoint[];
+}
+
+export interface GeoMapPoint {
+	id: string;
+	ip: string;
+	lat: number;
+	lon: number;
+	country: string;
+	city?: string;
+	region?: string;
+	asn?: number;
+	org?: string;
+	risk: "critical" | "high" | "medium" | "low";
+	abuse_confidence?: number;
+	is_tor: boolean;
+	is_proxy: boolean;
+	confidence_score: number;
+}
+
+export interface HopTimelinePoint {
+	hop: number;
+	from_host?: string;
+	by_host?: string;
+	ip?: string;
 }
 
 /** Core email record */

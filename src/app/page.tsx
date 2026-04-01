@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { ApiError, getDashboard } from "@/lib/api";
 import {
 	DashboardData,
 	RecentAnalysis,
 	TrendDataPoint,
-	GeoPoint,
 } from "@/lib/types";
 import { formatUtcTime } from "@/lib/format";
-import ThreatGraph from "@/components/dashboard/ThreatGraph";
 import Link from "next/link";
+
+const ThreatGraph = dynamic(() => import("@/components/dashboard/ThreatGraph"), {
+	ssr: false,
+});
 
 const DEMO_RECENT_ANALYSES: RecentAnalysis[] = [
 	{

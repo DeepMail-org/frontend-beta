@@ -21,6 +21,7 @@ authentication tokens.
     │ ui/            │ - Reusable UI components
     │ analysis/      │ - Analysis display components
     │ dashboard/     │ - Dashboard widgets
+    │ map/           │ - 2D world map + marker sidebar + hop timeline
     │ upload/        │ - File upload components
     └────────┬────────┘
              │
@@ -74,6 +75,26 @@ The UI uses a Dracula-inspired color palette for threat levels:
 | Safe | Green | `#50fa7b` | Low/clean results |
 | Neutral | Gray | `#6272a4` | Unknown, informational |
 
+## Map Experience (Backend-Driven)
+
+- 2D world map (React-Leaflet) replaces legacy 3D globe
+- Map points come from backend `geo_points` only (no client-side IP geolocation calls)
+- Received-hop playback uses backend `hop_timeline`
+- Click marker opens sidebar with IP, location, ASN/org, abuse score, proxy/TOR flags
+- Marker clustering activates for high-density datasets
+- Smooth interactions: wheel zoom, touch pinch zoom, focus fly-to on selection
+
+### Map Folder / Function Guide
+
+| File | Main function/component | Responsibility |
+|---|---|---|
+| `src/components/map/WorldMap.tsx` | `WorldMap` | SSR-safe dynamic wrapper for map canvas |
+| `src/components/map/WorldMapCanvas.tsx` | `WorldMapCanvas` | Leaflet canvas, marker render, hop path polylines, zoom controls |
+| `src/components/map/IpMarker.tsx` | `IpMarker` | Risk-colored marker node with tooltip |
+| `src/components/map/IpSidebar.tsx` | `IpSidebar` | Selected-node detail pane + report navigation |
+| `src/components/map/HopTimeline.tsx` | `HopTimeline` | Received-chain slider/playback UI |
+| `src/app/analysis/[emailId]/map/page.tsx` | `MapPage` | Fetches report and composes map + sidebar + timeline |
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 with App Router
@@ -95,6 +116,9 @@ bun run lint
 
 # Build for production
 bun run build
+
+# Run E2E tests
+bun run test:e2e
 ```
 
 ## Environment Variables
